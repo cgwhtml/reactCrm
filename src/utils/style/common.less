@@ -1,0 +1,38 @@
+//wq 2018/9/3
+.m-bottom(@param) {
+  margin-bottom: @param;
+}
+.m-right(@param) {
+  margin-bottom: @param;
+}
+.icon-asterisk{
+  display: inline-block;
+  margin-right: 4px;
+  content: "*";
+  font-family: SimSun;
+  line-height: 1;
+  font-size: 14px;
+  color: #f5222d;
+}
+
+
+
+
+.row-bottom{
+  .m-bottom(30px)
+}
+.btn-right{
+  .m-right(15px);
+}
+.main-content{
+  padding: 24px;
+  background: #ffffff;
+  min-height: 380px;
+}
+.ant-form-item-children{
+  .ant-row-flex{
+    .ant-row{
+      .m-bottom(0)
+    }
+  }
+}

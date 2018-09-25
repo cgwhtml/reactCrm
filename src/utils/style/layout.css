@@ -1,0 +1,37 @@
+#components-layout-demo-custom-trigger .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color .3s;
+}
+
+#components-layout-demo-custom-trigger .trigger:hover {
+    color: #1890ff;
+}
+
+#components-layout-demo-custom-trigger .logo {
+    height: 32px;
+    background: rgba(255,255,255,.2);
+    margin: 16px;
+}
+.ant-layout.ant-layout-has-sider{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.logo{
+    display: block;
+    margin: 20px auto;
+    -webkit-transition: all 1s;
+    -o-transition: all 1s;
+    transition: all 1s;
+}
+/*链接符-*/
+.icon-connectors{
+    width: 25px;
+    display: inline-block;
+    text-align: center;
+}
