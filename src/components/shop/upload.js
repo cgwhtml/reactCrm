@@ -1,12 +1,9 @@
 import React , {Component}  from 'react';
 import { Upload,Form, Icon, message,Row,Col,Button,Input} from 'antd';
-const FormItem = Form.Item;
+import {HttpRequest} from '../../utils/js/common';
+import domain from '../../domain/domain';
 
-function getBase64(img, callback) {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
+const FormItem = Form.Item;
 
 function beforeUpload(file) {
   const isJPG = file.type === 'image/jpeg';
@@ -17,36 +14,45 @@ function beforeUpload(file) {
   if (!isLt2M) {
     message.error('Image must smaller than 2MB!');
   }
-  return isJPG && isLt2M;
+  return false;
+  
 }
 
 class Avatar extends React.Component {
-  state = {
-    loading: false,
-  };
+  constructor(props){
+    super(props);
+    this.state = {
+      fileName:props.value,
+      loading: false,
+    };
+  }
+  // componentWillReceiveProps(nextProps) {
+  //   console.log(nextProps)
+  //   let equals = this.equals(nextProps.value, this.state.fileList);
 
-  handleChange = (info) => {
-    if (info.file.status === 'uploading') {
-      this.setState({ loading: true });
-      return;
-    }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, imageUrl => this.setState({
-        imageUrl,
-        loading: false,
-      }));
-    }
+  //   // 接收form 传入的 value 转换为内部数据结构
+  //   if ('value' in nextProps && !equals) {
+  //     this.setState({
+  //       fileList: this.propToFileList(nextProps.value)
+  //     });
+  //   }
+  // }
+  handleData = (info) => {
+    let file = info.file;
+    let param = new FormData()  // 创建form对象
+    param.append('picture', file)  // 通过append向form对象添加数据
+    HttpRequest.uploadRequest(
+      param,
+      res=>{
+          this.setState({
+            fileName:res,
+          })
+          if(this.props.onChange){
+            this.props.onChange(this.state.fileName) 
+          }
+      })
   }
   
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
-  }
   render() {
     const uploadButton = (
       <div>
@@ -54,16 +60,16 @@ class Avatar extends React.Component {
         <div className="ant-upload-text">Upload</div>
       </div>
     );
-    const imageUrl = this.state.imageUrl;
+    const imageUrl = this.state.fileName;
     return (
       <Upload
         name="avatar"
         listType="picture-card"
         className="avatar-uploader"
+        action={domain.uploadImg}
+        onChange={this.handleData}
         showUploadList={false}
-        action="//jsonplaceholder.typicode.com/posts/"
         beforeUpload={beforeUpload}
-        onChange={this.handleChange}
       >
         {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
       </Upload>
@@ -76,32 +82,33 @@ class uploadPhoto extends React.Component{
         expand: false,
       };
     
-      handleSearch = (e) => {
+      handleSubmit2 = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-          console.log('Received values of form: ', values);
-        });
+        this.props.form.validateFields((err, values) => {});
       }
-    
+      getItemsValue2 = ()=>{    //3、自定义方法，用来传递数据（需要在父组件中调用获取数据）
+        const values= this.props.form.getFieldsValue();       //4、getFieldsValue：获取一组输入控件的值，如不传入参数，则获取全部组件的值
+        return values;
+      }
       handleReset = () => {
         this.props.form.resetFields();
       }
-    
-      toggle = () => {
-        const { expand } = this.state;
-        this.setState({ expand: !expand });
-      }
+  
       getFields() {
         const { getFieldDecorator } = this.props.form;
         const children = [];
-        for (let i = 0; i < 10; i++) {
+        const imgNameList=[{name:'营业执照照片',title:'businessLicenseUrl',required:false},{name:'开户许可证照片',title:'openLicenseUrl',required:false},{name:'门店打款凭证',title:'payCertificateUrl',required:false},
+        {name:'门店场地租赁合同',title:'leaseContractUrl',required:false},{name:'身份证正面',title:'idcardFaceUrl',required:false},{name:'身份证反面',title:'idcardBackUrl',required:false},
+        {name:'门店照片',title:'shopFrontUrl',required:false},{name:'厅内照片',title:'hallUrl',required:false},{name:'团队照片',title:'teamUrl',required:false}]
+        imgNameList.map((item,i)=>{
           children.push(
-            <Col span={8} key={i}>
-              <FormItem label={`Field ${i}`} labelCol={{span:4}}>
-                {getFieldDecorator(`field-${i}`, {
+            <Col span={12} key={i}>
+              <FormItem label={item.name} labelCol={{span:5}}>
+                {getFieldDecorator(item.title, {
+                  initialValue:"",
                   rules: [{
-                    required: true,
-                    message: 'Input something!',
+                    required: item.required,
+                    message: '请将图片补充完整!',
                   }],
                 })(
                   <Avatar/>
@@ -109,21 +116,20 @@ class uploadPhoto extends React.Component{
               </FormItem>
             </Col>
           );
-        }
+        })
         return children;
       }
-    
     render(){
         return(
-            <Form>
-                <Row gutter={24}>{this.getFields()}</Row>
-                <FormItem style={{textAlign:"center"}}>
-                    <Button type="primary">取消</Button>
-                    <Button type="primary" htmlType="submit" style={{marginLeft:'30px'}}>确定</Button>
-                </FormItem>
+            <Form onSubmit={this.handleSubmit2}>
+              <Row gutter={24}>{this.getFields()}</Row>
+              <FormItem style={{textAlign:"center"}}>
+                <Button type="primary">取消</Button>
+                <Button type="primary" htmlType="submit" style={{marginLeft:'30px'}}>确定</Button>
+              </FormItem>
             </Form>        
         )
     }
 }
-const uploadPhotos = Form.create()(uploadPhoto);
-export default uploadPhotos; 
+const UploadPhotos = Form.create()(uploadPhoto);
+export default UploadPhotos; 

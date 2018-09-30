@@ -1,67 +1,95 @@
 import React  from 'react';
 import { NavLink } from 'react-router-dom';
 import { Form, Row, Col, Input, Button, Select,Icon,Radio,TreeSelect} from 'antd';
+import {HttpRequest} from '../../utils/js/common';
+import domain from '../../domain/domain';
 require('../../utils/style/userControl.css');
 
 const FormItem = Form.Item;
+const TreeNode = TreeSelect.TreeNode;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
-const treeData = [{
-  title: '管理层',
-  value: '0-0',
-  key: '0-0',
-}, {
-  title: '门店事业部',
-  value: '0-1',
-  key: '0-1',
-  children: [{
-    title: '区域管理',
-    value: '0-0-1',
-    key: '0-0-1',
-  }, {
-    title: '小门店',
-    value: '0-0-2',
-    key: '0-0-2',
-  }],
-}];
-
-function handleChange(value) {
-  console.log(`selected ${value}`);
-}
-
-function handleBlur() {
-  console.log('blur');
-}
-
-function handleFocus() {
-  console.log('focus');
-}
 
 class AdvancedSearchForm extends React.Component {
-  state = {
-    expand: false,
-    initialValue: 1,
-    values: undefined,
-  };
+
+  constructor(props){
+    super(props);
+    this.state={
+      expand: false,
+      initialValue: 1,
+      values: undefined,
+      departmentTreeList:[],
+      roleDataSources:[],
+      shopDataSources:[],
+    };
+  }
 
   handleSearch = (e) => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      console.log('Received values of form: ', values);
-    });
+      e.preventDefault();
+      this.props.form.validateFields((err, values) => {
+          const { filterCallback } = this.props;
+          filterCallback(values);
+      });
   }
 
   handleReset = () => {
     this.props.form.resetFields();
   }
+  componentDidMount(){
+    HttpRequest.getRequest(
+        {
+            url:domain.departmentTreeList,
+            params:{
+              parentId:'0001'
+            } 
+        },
+        res=>{
+          this.setState({
+            departmentTreeList:res.subDepartment
+          })
+        }
+    )
+  }
+  // 门店模糊查询
+  handleShopSearch(e){
+    HttpRequest.getRequest(
+      {
+          url:domain.shopSearchList,
+          params:{
+            keyWord:e,
+          },
+      },
+      res=>{
+        this.setState({
+          shopDataSources:res?res:[]
+        })
+      }
+    )
+  }
+  // 角色模糊查询
+  handleVagueSearch(e){
+    HttpRequest.getRequest(
+      {
+          url:domain.roleSearchList,
+          params:{
+            type:2,
+            searchParam:e
+          },
+      },
+      res=>{
+        this.setState({
+          roleDataSources:res.data?res.data:[]
+        })
+      }
+    )
+  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
-    };
+    const departmentTreeList=this.state.departmentTreeList;
+    const roleDataSources=this.state.roleDataSources;
+    const shopDataSources=this.state.shopDataSources;
     return (
       <Form
         className="ant-advanced-search-form wrappedAdvancedSearchForm"
@@ -69,23 +97,23 @@ class AdvancedSearchForm extends React.Component {
       >
         <Row gutter={24}>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="登陆账号" style={{display: "flex"}}>
+            <FormItem label="登录账号" style={{display: "flex"}}>
               {getFieldDecorator(`loginId`)(
-                <Input placeholder="请输入登陆账号"/>  
+                <Input placeholder="请输入登录账号" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
             <FormItem label="姓名" style={{display: "flex"}}>
               {getFieldDecorator(`fullname`)(
-                <Input placeholder="请输入姓名"/>  
+                <Input placeholder="请输入姓名" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="账号内部唯一识别号" style={{display: "flex"}}>
+            <FormItem label="id" style={{display: "flex"}}>
               {getFieldDecorator(`id`)(
-                <Input placeholder="请输入账号内部唯一识别号"/>  
+                <Input placeholder="请输入id" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
@@ -93,38 +121,85 @@ class AdvancedSearchForm extends React.Component {
             <FormItem label="所属部门" style={{display: "flex"}}>
               {getFieldDecorator(`departmentId`)(
                  <TreeSelect
-                 style={{ width: 300 }}
+                 style={{ width: 200 }}
                  initialValue={this.state.values}
-                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                 treeData={treeData}
+                 dropdownStyle={{ maxHeight: 400, overflow: 'auto'}}
                  placeholder="请选择"
+                 allowClear={true}
                  treeDefaultExpandAll
                  onChange={this.onChanges}
-               />  
+                 showSearch={true}
+               >
+                  {departmentTreeList.length > 0 &&
+                      departmentTreeList.map((item, i) => {
+                          return (
+                              <TreeNode value={item.id} title={item.name} key={i} disabled>
+                                 {item.subDepartment.length >0 && 
+                                  item.subDepartment.map((items,j)=>{
+                                    return (
+                                      <TreeNode value={items.id} title={items.name} key={items.id}></TreeNode>
+                                    )
+                                  })  
+                                }    
+                              </TreeNode>
+                          );
+                      })
+                  }
+              </TreeSelect>
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
             <FormItem label="所属门店" style={{display: "flex"}}>
               {getFieldDecorator(`shopName`)(
-                <Input placeholder="请输入所属门店"/>  
+                <Select
+                  showSearch
+                  placeholder="请输入门店名称"
+                  defaultActiveFirstOption={false}
+                  showArrow={false}
+                  notFoundContent="暂无相关门店信息"
+                  allowClear={true}
+                  filterOption={false}
+                  onSearch={this.handleShopSearch.bind(this)}
+                  style={{ width: 200 }}
+                >
+                  {shopDataSources.length > 0 &&
+                      shopDataSources.map((item, i) => {
+                          return (
+                              <Select.Option key={i} value={item.name}>
+                                  {item.name}
+                              </Select.Option>
+                          );
+                      })
+                  }
+                </Select>
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
             <FormItem label="角色" style={{display: "flex"}}>
               {getFieldDecorator(`roleId`)(
-                <Select
-                showSearch
-                style={{ width: 200 }}
-                placeholder="请选择角色"
-                optionFilterProp="children"
-                onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              >
-              </Select> 
+                  <Select
+                  showSearch
+                  placeholder="请输入角色名称"
+                  allowClear={true}
+                  defaultActiveFirstOption={false}
+                  showArrow={false}
+                  filterOption={false}
+                  onSearch={this.handleVagueSearch.bind(this)}
+                  notFoundContent="暂无相关角色信息"
+                  style={{ width: 200 }}
+                >
+                  {roleDataSources.length > 0 &&
+                      roleDataSources.map((item, i) => {
+                          return (
+                              <Select.Option key={i} value={item.id}>
+                                  {item.name}
+                              </Select.Option>
+                          );
+                      })
+                  }
+                </Select>
               )}
             </FormItem>
           </Col>
@@ -140,7 +215,7 @@ class AdvancedSearchForm extends React.Component {
           </Col>
           <Col span={8}>
             <FormItem label="已删除" labelCol={{span:2}}>
-              {getFieldDecorator(`isDelete`)(
+              {getFieldDecorator(`isDeleted`)(
                 <RadioGroup>
                   <Radio value="0">未删除</Radio>
                   <Radio value="1">已删除</Radio>
@@ -151,8 +226,8 @@ class AdvancedSearchForm extends React.Component {
         </Row>
         <Row>
           <Col span={24} style={{ textAlign: 'right' }}>
-            <Button type="primary" htmlType="submit">搜索</Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
+            <Button htmlType="submit">查询</Button>
+            <Button type="danger"  style={{ marginLeft: 8 }} onClick={this.handleReset}>
               清除
             </Button>
             <Button style={{ marginLeft: 8 }}>

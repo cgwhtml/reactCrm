@@ -28,6 +28,7 @@ class Manage extends Component{
             value:'',
             son:'',
             rows:{},
+            searchValues:{},
             pageSize: 10,
             pageCur: 1
         };
@@ -45,6 +46,7 @@ class Manage extends Component{
             { title: '加盟方式', dataIndex: 'joinType', key: 'joinType', width: 150 },
             { title: '等级', dataIndex: 'level', key: 'level', width: 150 },
             { title: '加盟区域', dataIndex: 'joinShopRegion', key: 'joinShopRegion' , width: 150},
+            { title: '入网日期', dataIndex: 'date', key: 'date' , width: 150},
             { title: '区域经理', dataIndex: 'areaManager', key: 'areaManager' , width: 150},
             { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName' , width: 150},
             {
@@ -53,20 +55,21 @@ class Manage extends Component{
                 fixed: 'right',
                 width: 200,
                 render: (text, record,index) =>(<div>
-                    <Button className='btn-right'>
-                        {/*<a href="javascript:void(0)" onClick={() =>this.handleRevampClick(text, record,index)}>修改</a>*/}
-                        <NavLink exact to={{pathname:'/editAddShop',state:{id: index}}}>修改</NavLink>
-                    </Button>
+             
+                    {/* <a href="javascript:void(0)" onClick={() =>this.handleRevampClick(text, record,index)}>修改</a> */}
+                    {/* <NavLink exact to={{pathname:`/editAddShop?id=${record}`,state:{id: index}}}>修改</NavLink> */}
+                    <Button onClick={() =>this.handleRevampClick(text, record,index)}>修改</Button>
+                   
                     {record.isDelete==0 ?
                         (
-                            <Button type="danger" style={{display:'inline-block'}} >
+                            <Button type="danger">
                                 <Popconfirm title="确定删除吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >删除</a>
                                 </Popconfirm>
                             </Button>
                         ):(
                             <Button type="danger" style={{display:'inline-block'}}>
-                                <Popconfirm title="确定恢复吗?" onConfirm={() => this.handleRecoverClick(record)}>
+                                <Popconfirm title="确定恢复吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >恢复</a>
                                 </Popconfirm>
                             </Button>        
@@ -78,90 +81,15 @@ class Manage extends Component{
     }
     //表格
     handleRevampClick=(text, record, index)=>{
-        console.log(this.props);
-        this.props.router.replace({
-            pathname: '/modify',
-            query: {foo:index}
-        })
-        console.log(text);
-        console.log(record);
-        console.log(index);
+        window.location.href=`/editAddShop?id=${record.id}`
     }
-    // 删除
-    handleDeleteClick=(record)=>{
-        HttpRequest.postRequest({
-            url:domain.shopDelete,
-            data:{
-                shopId:parseInt(record.id),
-                operateType:record.isDelete==0?1:0    
-            }
-            },
-            result=>{
-                console.log(7)
-            })
-    }
-    // 恢复
-    handleRecoverClick=(record)=>{
-        HttpRequest.postRequest({
-            url:domain.shopDelete,
-            data:{
-                shopId:parseInt(record.id),
-                operateType:record.isDelete==0?1:0    
-            }
-            },
-            result=>{
-                console.log(7)
-            })
-    }
-    //分页
-    handleOnChange(current) {
-        HttpRequest.getRequest(
-            {
-                url:domain.shopList,
-                params:{                  
-                    pageCur:current,
-                    pageSize:this.state.pageSize
-                } 
-            },
-            res=>{
-                this.handleData(res)
-            }
-        )
-    }
-    onShowSizeChange(current, pageSize) {
-        HttpRequest.getRequest(
-            {
-                url:domain.shopList,
-                params:{
-                    pageCur:current,
-                    pageSize:pageSize
-                }   
-            },
-            res=>{
-                this.handleData(res,pageSize)
-            }
-        )
-    } 
-    componentDidMount=()=>{
-        HttpRequest.getRequest(
-            {
-                url:domain.shopList,
-                params:{
-                    pageCur:this.state.pageCur,
-                    pageSize:this.state.pageSize
-                } 
-            },
-            res=>{
-                this.handleData(res)
-            }
-        )
-    }
-    // 搜索
-    handleFilter(values) {     
+     // 初始化列表数据函数
+     initData=(current,pageSize)=>{
         let obj=Object.assign(
-            {pageCur:this.state.pageCur,
-                pageSize:this.state.pageSize
-            } , values)
+            {
+                pageCur:current?current:this.state.pageCur,
+                pageSize:pageSize?pageSize:this.state.pageSize
+            } , this.state.searchValues)
         HttpRequest.getRequest(
             {
                 url:domain.shopList,
@@ -172,8 +100,40 @@ class Manage extends Component{
             }
         )
     }
+    // 删除以及恢复
+    handleDeleteClick=(record)=>{
+        HttpRequest.postRequest({
+            url:domain.shopDelete,
+            data:{
+                shopId:parseInt(record.id),
+                operateType:record.isDelete==0?1:0    
+            }
+            },
+            result=>{
+                this.initData()
+            })
+    }
+    // 搜索
+    handleFilter(values) {
+        this.setState({
+            searchValues:values
+        })     
+        this.initData()
+    }
+    //分页
+    handleOnChange(current) {
+        this.initData(current)
+    }
+    onShowSizeChange(current, pageSize) {
+        this.setState({
+            pageSize:pageSize
+        })
+        this.initData(current,pageSize);
+    } 
+    componentDidMount=()=>{
+        this.initData();
+    }
     handleData=(res,pageSize)=>{
-        console.log(res)
         if(res.data){
             res.data.map(item=>{
                 item.joinShopRegion=item.joinShopRegion.map(items=>{
@@ -182,8 +142,7 @@ class Manage extends Component{
                 item.isDeleteName=item.isDelete==0?'未删除':'已删除'
             })
             this.setState({
-                rows: res,
-                pageSize:pageSize?pageSize:10
+                rows: res
             })
         }
     }

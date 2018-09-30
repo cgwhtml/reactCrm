@@ -1,6 +1,7 @@
 import React , {Component} from 'react';
 import axios from 'axios';
 import Qs from 'qs'
+import domain from '../../domain/domain'
 
 //获取穿梭框左边的name值
 class TransferLeft extends Component{
@@ -69,6 +70,20 @@ class HttpRequest extends  Component{
                     callback(result);
                 }
             });
+    }
+
+    static uploadRequest(param,callback){
+        let config = {
+            headers: {'Content-Type': 'multipart/form-data'}
+          }
+        axios.post(domain.uploadImg, param, config)
+        .then(res => {
+            let data=res.data;
+            if(data.error==0){
+                let result=data.result;
+                callback(result);
+            }
+        })
     }
 }
 
