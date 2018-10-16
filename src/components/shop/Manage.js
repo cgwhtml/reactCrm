@@ -34,20 +34,20 @@ class Manage extends Component{
         };
         this.columns=[
             { title: '序号', dataIndex: 'key', key: 'id', fixed: 'left', width: 100 },
-            { title: '门店编号', dataIndex: 'id', key: 'shopId', fixed: 'left' , width: 100},
+            { title: '门店编号', dataIndex: 'id', key: 'shopId', width: 100},
             { title: '门店名称', dataIndex: 'name', key: 'name', width: 150 },
-            { title: '门店地址', dataIndex: 'address', key: 'address', width: 150 },
-            { title: '公司名称', dataIndex: 'company', key: 'company', width: 150 },
-            { title: '负责人', dataIndex: 'principal', key: 'principal', width: 150 },
-            { title: '主管', dataIndex: 'manager', key: 'manager', width: 150 },
+            { title: '门店地址', dataIndex: 'address', key: 'address', width: 200 },
+            { title: '公司名称', dataIndex: 'company', key: 'company', width: 300 },
+            { title: '老板', dataIndex: 'principal', key: 'principal', width: 150 },
+            { title: '管理员', dataIndex: 'manager', key: 'manager', width: 150 },
             { title: '营业情况', dataIndex: 'businessCondition', key: 'businessCondition', width: 150 },
             { title: '分销级别', dataIndex: 'distributionLevel', key: 'distributionLevel', width: 150 },
             { title: '门店类别', dataIndex: 'type', key: 'type' , width: 150},
             { title: '加盟方式', dataIndex: 'joinType', key: 'joinType', width: 150 },
             { title: '等级', dataIndex: 'level', key: 'level', width: 150 },
-            { title: '加盟区域', dataIndex: 'joinShopRegion', key: 'joinShopRegion' , width: 150},
-            { title: '入网日期', dataIndex: 'date', key: 'date' , width: 150},
+            { title: '加盟区域', dataIndex: 'joinShopRegion', key: 'joinShopRegion' , width: 200},
             { title: '区域经理', dataIndex: 'areaManager', key: 'areaManager' , width: 150},
+            { title: '入网日期', dataIndex: 'joinDate', key: 'joinDate' , width: 150},
             { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName' , width: 150},
             {
                 title: '操作',
@@ -55,20 +55,19 @@ class Manage extends Component{
                 fixed: 'right',
                 width: 200,
                 render: (text, record,index) =>(<div>
-             
-                    {/* <a href="javascript:void(0)" onClick={() =>this.handleRevampClick(text, record,index)}>修改</a> */}
-                    {/* <NavLink exact to={{pathname:`/editAddShop?id=${record}`,state:{id: index}}}>修改</NavLink> */}
-                    <Button onClick={() =>this.handleRevampClick(text, record,index)}>修改</Button>
-                   
+                    <Button>
+                        <NavLink exact to={{pathname:'/editAddShop',state:{id:record.id}}}>修改</NavLink>
+                    </Button>
+                    {/*<Button onClick={() =>this.handleRevampClick(text, record,index)}>修改</Button>*/}
                     {record.isDelete==0 ?
                         (
-                            <Button type="danger">
+                            <Button type="danger" style={{display:'inline-block',marginLeft:'10px'}}>
                                 <Popconfirm title="确定删除吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >删除</a>
                                 </Popconfirm>
                             </Button>
                         ):(
-                            <Button type="danger" style={{display:'inline-block'}}>
+                            <Button type="danger" style={{display:'inline-block',marginLeft:'10px'}}>
                                 <Popconfirm title="确定恢复吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >恢复</a>
                                 </Popconfirm>
@@ -81,15 +80,15 @@ class Manage extends Component{
     }
     //表格
     handleRevampClick=(text, record, index)=>{
-        window.location.href=`/editAddShop?id=${record.id}`
+        this.props.history.push(`/system/editAddShop?id=${record.id}`)
     }
      // 初始化列表数据函数
-     initData=(current,pageSize)=>{
+     initData=(current,pageSize,searchValues)=>{
         let obj=Object.assign(
             {
                 pageCur:current?current:this.state.pageCur,
                 pageSize:pageSize?pageSize:this.state.pageSize
-            } , this.state.searchValues)
+            } , searchValues)
         HttpRequest.getRequest(
             {
                 url:domain.shopList,
@@ -117,18 +116,19 @@ class Manage extends Component{
     handleFilter(values) {
         this.setState({
             searchValues:values
+        },()=>{
+            this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues)
         })     
-        this.initData()
     }
     //分页
     handleOnChange(current) {
-        this.initData(current)
+        this.initData(current,'',this.state.searchValues)
     }
     onShowSizeChange(current, pageSize) {
         this.setState({
             pageSize:pageSize
         })
-        this.initData(current,pageSize);
+        this.initData(current,pageSize,this.state.searchValues);
     } 
     componentDidMount=()=>{
         this.initData();
@@ -139,6 +139,7 @@ class Manage extends Component{
                 item.joinShopRegion=item.joinShopRegion.map(items=>{
                     return items.region    
                 }).join(",")
+                item.key+=1;
                 item.isDeleteName=item.isDelete==0?'未删除':'已删除'
             })
             this.setState({

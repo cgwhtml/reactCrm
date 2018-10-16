@@ -1,5 +1,5 @@
 import React , {Component}  from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, DatePicker,Checkbox, Button} from 'antd';
+import { Form, Input, Select, Row, Col, DatePicker} from 'antd';
 import moment from 'moment'
 import {HttpRequest} from '../../utils/js/common';
 import domain from '../../domain/domain';
@@ -16,6 +16,9 @@ class RegistrationForm extends React.Component {
         provinceList:[],
         cityList:[],
         countyList:[],
+        shopUserList:[],
+        bossMsg:{},
+        managerMsg:{},
         shopTypeList:[],
         joinTypeList:[],
         levelList:[],
@@ -28,15 +31,20 @@ class RegistrationForm extends React.Component {
         pickList:[],
         editMsg:{},
         joinCityList:[],
-        joinDistrictList:[]
+        joinDistrictList:[],
+        isWebsiteOpenList:[]
     };
 
   }
   handleSubmit = (e) => {
     e.preventDefault();
+    let flag=true;
     this.props.form.validateFieldsAndScroll((err, values) => {
-      
+      if (err) {
+        flag=false
+      }
     });
+    return flag;
   }
   getItemsValue= ()=>{    //3、自定义方法，用来传递数据（需要在父组件中调用获取数据）
     const values= this.props.form.getFieldsValue();       //4、getFieldsValue：获取一组输入控件的值，如不传入参数，则获取全部组件的值
@@ -79,11 +87,16 @@ class RegistrationForm extends React.Component {
             this.setState({
               shopStatusList:res
             })
+          }else if(type=="shop_is_website_open"){
+            this.setState({
+              isWebsiteOpenList:res
+            })
           }
         }
     )    
 }
 componentDidMount(){
+  
   //省查询
   HttpRequest.getRequest(
       {
@@ -98,31 +111,64 @@ componentDidMount(){
           })
       }
   )
-  HttpRequest.getRequest(
-    {
-        url:domain.shopDetail,
-        params:{
-          shopId:468
-        } 
-    },
-    res=>{
-      if(res){
-        res.joinDistrictList=[];
-        res.joinDistrictRegion.map((item)=>{
-          res.joinDistrictList.push(item.regionId)
-        })
-        if(res.provinceCode){
-          this.changeProvince(res.provinceCode)
-          this.changeCity(res.cityCode)
-          this.changeProvince2(res.joinProvinceRegion?res.joinProvinceRegion.regionId:res.provinceCode,1)
-          this.changeCity2(res.joinProvinceRegion?res.joinCityRegion.regionId:res.cityCode,1)
-        }
+  // 详情查询
+  const id=this.props.id;
+  if(id){
+    // 门店人员查询
+    HttpRequest.getRequest(
+      {
+          url:domain.shopUserList,
+          params:{
+            shopId:id
+          } 
+      },
+      res=>{
         this.setState({
-          editMsg:res?res:{}
+            shopUserList:res,
         })
       }
-    }
-  )
+    )
+    HttpRequest.getRequest(
+      {
+          url:domain.shopDetail,
+          params:{
+            shopId:id
+          } 
+      },
+      res=>{
+        if(res){
+          res.joinDistrictList=[];
+          res.joinDistrictRegion.map((item)=>{
+            res.joinDistrictList.push(item.regionId)
+          })
+          if(res.provinceCode){
+            this.changeProvince(res.provinceCode);
+            this.changeCity(res.cityCode);
+            this.changeProvince2(res.joinProvinceRegion?res.joinProvinceRegion.regionId:res.provinceCode,1);
+            this.changeCity2(res.joinProvinceRegion?res.joinCityRegion.regionId:res.cityCode,1);
+          }
+          if(res.orgName){
+            this.searchCompany(res.orgName);
+            this.setState({
+              orgObj:{orgCode:res.orgCode?res.orgCode:'',orgPrincipalName:res.orgPrincipalName?res.orgPrincipalName:'',orgPrincipalPhone:res.orgPrincipalPhone?res.orgPrincipalPhone:''}
+            })
+          }
+          if(res.areaManagerName){
+            this.searchManage(res.areaManagerName)
+          }
+          if(res.bdManagerName){
+            this.searchPickPerson(res.bdManagerName)
+          }
+          this.onChangeBoss(res.bossId)
+          this.onChangeManageer(res.managerId)
+          this.onChangeCompany(res.orgId)
+          this.setState({
+            editMsg:res?res:{}
+          })
+        }
+      }
+    )
+  }
   // 门店类型
   this.initSelect('shop_type');
   // 分销级别
@@ -135,20 +181,22 @@ componentDidMount(){
   this.initSelect('is_new_shop');
   // 门店状态
   this.initSelect('shop_status');
+  //门店是否公开
+  this.initSelect('shop_is_website_open')
   }
   changeProvince(e){
       HttpRequest.getRequest(
-          {
-              url:domain.areaList,
-              params:{
-                  regionId:e
-              } 
-          },
-          res=>{
-            this.setState({
-                cityList:res,
-            })
-          }
+        {
+          url:domain.areaList,
+          params:{
+              regionId:e
+          } 
+        },
+        res=>{
+          this.setState({
+              cityList:res,
+          })
+        }
       )
   }
   changeCity(e,join){
@@ -213,7 +261,6 @@ changeCity2(e,join){
     )
   }
   onChangeCompany(e){
-    console.log(e)
     this.state.companyList.map((item)=>{
       if(item.id==e){
         this.setState({
@@ -269,33 +316,37 @@ changeCity2(e,join){
       });
     }
   }
+  onChangeBoss(e){
+    this.state.shopUserList.map((item)=>{
+      if(item.id==e){
+        this.setState({
+          bossMsg:item
+        })
+      }
+    })    
+  }
+  onChangeManageer(e){
+    this.state.shopUserList.map((item)=>{
+      if(item.id==e){
+        this.setState({
+          managerMsg:item
+        })
+      }
+    })  
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
-    const provinceList =this.state.provinceList;
-    const cityList =this.state.cityList;
-    const countyList=this.state.countyList;
-    const shopTypeList=this.state.shopTypeList;
-    const joinTypeList=this.state.joinTypeList;
-    const levelList=this.state.levelList;
-    const shoplevelList=this.state.shoplevelList;
-    const isNewShopList=this.state.isNewShopList;
-    const shopStatusList=this.state.shopStatusList;
-    const companyList=this.state.companyList;
-    const manageList=this.state.manageList;
-    const pickList=this.state.pickList;
-    const editMsg=this.state.editMsg
+    const { provinceList, cityList, countyList,shopTypeList,joinTypeList,shopUserList,levelList,shoplevelList,isNewShopList,shopStatusList,companyList,
+      manageList,pickList,editMsg,bossMsg,managerMsg,isWebsiteOpenList} = this.state;
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <Row gutter={24}>
           <Col span={8} style={{ textAlign: 'left'}}>
             <FormItem label="门店编号" style={{display: "flex"}}>
-              {getFieldDecorator(`id`,{
-                initialValue:editMsg.id,
-                rules: [{
-                  required: true,message: '请输入门店名称!',
-                  }]
-                })(
-                <Input placeholder="请输入门店编号" style={{ width: 300 }}/>  
+              {getFieldDecorator(`id`)(
+                <span>{editMsg.id}</span>  
               )}
             </FormItem>
           </Col>
@@ -320,7 +371,7 @@ changeCity2(e,join){
                       required: true,message: '请选择公司名称!',
                     }],
                   })(
-                    <Select
+                  <Select
                     showSearch
                     placeholder="请输入公司名称"
                     defaultActiveFirstOption={false}
@@ -439,29 +490,40 @@ changeCity2(e,join){
           <Col span={8}>
             <FormItem label="门店老板" style={{display: "flex"}}>
                 {getFieldDecorator(`bossId`, {
-                  initialValue:editMsg.bossName,
+                  initialValue:editMsg.bossId,
                   rules: [{
                     required: this.state.editRequired,message: '请选择门店老板!',
                   }],
                 })(
-                    <Select
-                    showSearch
-                    allowClear={true}
-                    style={{ width: 200 }}
-                    placeholder="请选择门店老板"
-                    optionFilterProp="children"
-                  />
+                  <Select
+                  showSearch
+                  allowClear={true}
+                  style={{ width: 200 }}
+                  placeholder="请选择门店老板"
+                  optionFilterProp="children"
+                  onChange={this.onChangeBoss.bind(this)}
+                >
+                  {shopUserList.length>0 && 
+                    shopUserList.map((item,i) => {
+                        return (
+                            <Option key={i} value={item.id}>
+                                {item.fullname}
+                            </Option>    
+                        )        
+                    })
+                  }
+                </Select>
                 )}
             </FormItem>        
           </Col>
           <Col span={8}>
             <FormItem label="老板电话" style={{display: "flex"}}>
-                <span>135989458888</span>
+                <span>{bossMsg.mobile?bossMsg.mobile:''}</span>
             </FormItem>        
           </Col>
           <Col span={8}>
             <FormItem label="老板身份证号码" style={{display: "flex"}}>
-                <span>1423558887899999999999</span>
+                <span>{bossMsg.idCard?bossMsg.idCard:''}</span>
             </FormItem>        
           </Col>
           <Col span={8}>
@@ -472,24 +534,35 @@ changeCity2(e,join){
                     required: this.state.editRequired,message: '请选择门店主管!',
                   }],
                 })(
-                    <Select
+                  <Select
                     showSearch
-                    allowClear={true}
                     style={{ width: 200 }}
+                    allowClear={true}
                     placeholder="请选择门店主管"
                     optionFilterProp="children"
-                  />
+                    onChange={this.onChangeManageer.bind(this)}
+                  >
+                    {shopUserList.length>0 && 
+                      shopUserList.map((item,i) => {
+                          return (
+                              <Option key={i} value={item.id}>
+                                  {item.fullname}
+                              </Option>    
+                          )        
+                      })
+                    }
+                  </Select>
                 )}
             </FormItem>        
           </Col>
           <Col span={8}>
             <FormItem label="主管电话" style={{display: "flex"}}>
-                <span>135989458888</span>
+                <span>{managerMsg.mobile?managerMsg.mobile:''}</span>
             </FormItem>        
           </Col>
           <Col span={8}>
             <FormItem label="主管身份证号码" style={{display: "flex"}}>
-                <span>1423558887899999999999</span>
+                <span>{managerMsg.idCard?managerMsg.idCard:''}</span>
             </FormItem>        
           </Col>
           <Col span={24}>
@@ -544,7 +617,7 @@ changeCity2(e,join){
                         {pickList.length > 0 &&
                             pickList.map((item, i) => {
                                 return (
-                                    <Option key={i} value={item.id}>
+                                    <Option key={i} value={item.fullname}>
                                         {item.fullname}
                                     </Option>
                                 );
@@ -801,7 +874,7 @@ changeCity2(e,join){
           <Col span={8}>
             <FormItem label="是否新店" style={{display: "flex"}}>
                 {getFieldDecorator(`isNewShop`, {
-                  initialValue:editMsg.isNewShop?editMsg.isNewShop.isNewShop:'',
+                  initialValue:editMsg.isNewShop?editMsg.isNewShop.code:'',
                   rules: [{
                     required: true,message: '请选择是否新店!',
                   }],
@@ -825,27 +898,50 @@ changeCity2(e,join){
                 )}
             </FormItem>        
           </Col>
-          <Col span={24}  style={{display: "flex",alignItem:"center"}}>
+          <Col span={8}  style={{display: "flex",alignItem:"center"}}>
             <FormItem>
               <span>门店定位：</span>    
             </FormItem>
             <FormItem label="经度" style={{display: "flex",width:150}}>
               {getFieldDecorator(`longitude`,
               {initialValue:editMsg.longitude})(
-                <Input style={{width:100}}/>   
+                <Input type="number" style={{width:100}}/>   
               )}
             </FormItem>
             <FormItem label="纬度" style={{display: "flex",width:150}}>
               {getFieldDecorator(`latitude`,{initialValue:editMsg.latitude})(
-                <Input style={{width:100}}/>   
+                <Input type="number" style={{width:100}}/>   
               )}
             </FormItem>
           </Col>
+          <Col span={8}>
+            <FormItem label="门店是否公开" style={{display: "flex"}}>
+                {getFieldDecorator(`isWebsiteOpen`, {
+                  initialValue:editMsg.isWebsiteOpen?editMsg.isWebsiteOpen.code:'',
+                  rules: [{
+                    required: true,message: '请选择是否新店!',
+                  }],
+                })(
+                  <Select
+                    showSearch
+                    style={{ width: 200 }}
+                    placeholder="请选择门店是否公开"
+                    optionFilterProp="children"
+                  >
+                  {isWebsiteOpenList.length>0 && 
+                      isWebsiteOpenList.map((item,i) => {
+                        return (
+                            <Option key={item.code} value={item.code}>
+                                {item.name}
+                            </Option>    
+                        )        
+                    })
+                  }
+                  </Select> 
+                )}
+            </FormItem>        
+          </Col>
         </Row>
-        <FormItem style={{textAlign:"center"}}>
-          <Button type="primary">取消</Button>
-          <Button type="primary" htmlType="submit" style={{marginLeft:'30px'}}>确定</Button>
-        </FormItem>
       </Form>
     );
   }

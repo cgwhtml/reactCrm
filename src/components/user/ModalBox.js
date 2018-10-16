@@ -1,32 +1,23 @@
-//wq
+//wq 角色分配 品牌分配
 import React , {Component} from 'react';
 import { Modal, Button,Transfer } from 'antd';
 import axios from 'axios';
+
+
 import domain from '../../domain/domain';
 
-let mockData = [];
-for (let i = 0; i < 20; i++) {
-    mockData.push({
-        id: i.toString(),
-        title: `角色${i + 1}`,
-        description: `description of content${i + 1}`,
-        disabled: i % 3 < 1,
-    });
-}
+import {TransferLeft,HttpRequest} from '../../utils/js/common'
 
-let targetKeys = mockData
-    .filter(item => +item.id % 5 > 1)
-    .map(item => item.id);
 
-console.log(targetKeys);
 
 //角色分配
 class ModalBox extends Component{
     constructor(props){
         super(props);
         this.state={
+            mockData:[],
             visible: false,
-            targetKeys,
+            targetKeys:[],
             selectedKeys: [],
             titles:['未分配角色', '已分配角色']
         };
@@ -34,21 +25,27 @@ class ModalBox extends Component{
     }
     //模态框
     showModal = () => {
-        console.log(this.props.mockData);
         this.setState({
             visible: true,
         });
     }
-    handleModalOk = (e) => {
-        console.log(e.target);
+    //传值
+    filterList=()=>{
         const { filterModalData } = this.props;
-        filterModalData(this.state.targetKeys);
-        this.setState({
+        let keys=this.state.targetKeys;
+        let mockData=this.state.mockData;
+        let name=TransferLeft.getName(keys,mockData,'role');
+        filterModalData(name);
+    }
+    handleModalOk = (e) => {
+        let _this=this;
+        _this.filterList();
+        _this.setState({
             visible: false,
         });
     }
     handleModalCancel = (e) => {
-        console.log(e);
+        // console.log(e);
         this.setState({
             visible: false,
         });
@@ -57,21 +54,21 @@ class ModalBox extends Component{
     handleChange = (nextTargetKeys, direction, moveKeys) => {
         this.setState({ targetKeys: nextTargetKeys });
 
-        console.log('targetKeys: ', nextTargetKeys);
-        console.log('direction: ', direction);
-        console.log('moveKeys: ', moveKeys);
+        // console.log('targetKeys: ', nextTargetKeys);
+        // console.log('direction: ', direction);
+        // console.log('moveKeys: ', moveKeys);
     }
 
     handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
         this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
 
-        console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-        console.log('targetSelectedKeys: ', targetSelectedKeys);
+        // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
+        // console.log('targetSelectedKeys: ', targetSelectedKeys);
     }
 
     handleScroll = (direction, e) => {
-        console.log('direction:', direction);
-        console.log('target:', e.target);
+        // console.log('direction:', direction);
+        // console.log('target:', e.target);
     }
     // componentWillReceiveProps=(nextProps)=>{
     //     this.setState({
@@ -80,21 +77,16 @@ class ModalBox extends Component{
     // }
     componentDidMount = ()=>{
         var _this=this;
-        axios.post(domain.roles,{
-            params:{
-                userId:1578
-            }
-        }).then(res=>{
-            let data=res.data;
-            console.log(data);
-            if(data.error==0){
-                let result=data.result;
-                mockData=result.withoutRoles;
+        HttpRequest.getRequest({
+            url: domain.roles,
+            params: {userId:_this.props.id},
+        }, (result)=>{
                 _this.setState({
-                    targetKeys:["10000001-ab32-11e8-a23f-00155d58fc01"]
-                })
-            }
-        });
+                    mockData:result.allRoles,
+                    targetKeys:result.withRoles
+                });
+                _this.filterList();
+        })
     }
 
     render(){
@@ -109,7 +101,7 @@ class ModalBox extends Component{
                 >
                     <Transfer
                         rowKey={record => record.id}
-                        dataSource={mockData}
+                        dataSource={this.state.mockData}
                         titles={this.state.titles}
                         targetKeys={this.state.targetKeys}
                         selectedKeys={this.state.selectedKeys}
@@ -125,26 +117,14 @@ class ModalBox extends Component{
 }
 
 
-const mockMasterData = [];
-for (let i = 0; i < 20; i++) {
-    mockMasterData.push({
-        key: i.toString(),
-        title: `品牌${i + 1}`,
-        description: `description of content${i + 1}`,
-        disabled: i % 3 < 1,
-    });
-}
-
-const targetKeysMaster = mockMasterData
-    .filter(item => +item.key % 3 > 1)
-    .map(item => item.key);
 //主品牌
 class MasterBrand extends Component{
     constructor(props){
         super(props);
         this.state={
+            mockData:[],
             visible: false,
-            targetKeys:targetKeysMaster,
+            targetKeys:[],
             selectedKeys: [],
             titles:['未分配品牌', '已分配品牌']
         };
@@ -156,11 +136,19 @@ class MasterBrand extends Component{
             visible: true,
         });
     }
+    //传值
+    filterList=()=>{
+        const { filterModalData } = this.props;
+        let keys=this.state.targetKeys;
+        let mockData=this.state.mockData;
+        let name=TransferLeft.getName(keys,mockData);
+        filterModalData(name);
+    }
     handleModalOk = (e) => {
         console.log(e.target);
-        const { filterModalData } = this.props;
-        filterModalData(this.state.targetKeys);
-        this.setState({
+        let _this=this;
+        _this.filterList();
+        _this.setState({
             visible: false,
         });
     }
@@ -174,36 +162,44 @@ class MasterBrand extends Component{
     handleChange = (nextTargetKeys, direction, moveKeys) => {
         this.setState({ targetKeys: nextTargetKeys });
 
-        console.log('targetKeys: ', nextTargetKeys);
-        console.log('direction: ', direction);
-        console.log('moveKeys: ', moveKeys);
+        // console.log('targetKeys: ', nextTargetKeys);
+        // console.log('direction: ', direction);
+        // console.log('moveKeys: ', moveKeys);
     }
 
     handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
         this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
 
-        console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-        console.log('targetSelectedKeys: ', targetSelectedKeys);
+        // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
+        // console.log('targetSelectedKeys: ', targetSelectedKeys);
     }
 
     handleScroll = (direction, e) => {
-        console.log('direction:', direction);
-        console.log('target:', e.target);
+        // console.log('direction:', direction);
+        // console.log('target:', e.target);
+    }
+    brand=()=>{
+        var _this=this;
+        console.log(_this.props.id);
+        HttpRequest.getRequest({
+            url: domain.brand,
+            params: {
+                isMain:1,
+                userId:_this.props.id
+            },
+        }, (result)=>{
+            _this.setState({
+                mockData:result.allBrands,
+                targetKeys:result.bindings?result.bindings:[]
+            });
+            _this.filterList();
+
+        })
     }
     componentDidMount = ()=>{
-        axios.get(domain.roles,{
-            params:{
-                userId:1578
-            }
-        }).then(res=>{
-            console.log(res);
-        });
+
     }
-    // componentWillReceiveProps=(nextProps)=>{
-    //     this.setState({
-    //         targetKeys:nextProps.mockData.targetKeys
-    //     });
-    // }
+
     render(){
         return(
             <div>
@@ -215,14 +211,15 @@ class MasterBrand extends Component{
                     onCancel={this.handleModalCancel}
                 >
                     <Transfer
-                        dataSource={mockMasterData}
+                        rowKey={record => record.id}
+                        dataSource={this.state.mockData}
                         titles={this.state.titles}
                         targetKeys={this.state.targetKeys}
                         selectedKeys={this.state.selectedKeys}
                         onChange={this.handleChange}
                         onSelectChange={this.handleSelectChange}
                         onScroll={this.handleScroll}
-                        render={item => item.title}
+                        render={item => item.name}
                     />
                 </Modal>
             </div>
@@ -232,26 +229,13 @@ class MasterBrand extends Component{
 
 
 //非主品牌
-const mockNotMainData = [];
-for (let i = 0; i < 20; i++) {
-    mockNotMainData.push({
-        key: i.toString(),
-        title: `非主品牌${i + 1}`,
-        description: `description of content${i + 1}`,
-        disabled: i % 3 < 1,
-    });
-}
-
-const targetKeysNotMain = mockNotMainData
-    .filter(item => +item.key % 3 > 1)
-    .map(item => item.key);
-//非主品牌
 class NotMainBrand extends Component{
     constructor(props){
         super(props);
         this.state={
+            mockData:[],
             visible: false,
-            targetKeys:targetKeysNotMain,
+            targetKeys:[],
             selectedKeys: [],
             titles:['未分配品牌', '已分配品牌']
         };
@@ -263,11 +247,19 @@ class NotMainBrand extends Component{
             visible: true,
         });
     }
+    //传值
+    filterList=()=>{
+        const { filterModalData } = this.props;
+        let keys=this.state.targetKeys;
+        let mockData=this.state.mockData;
+        let name=TransferLeft.getName(keys,mockData);
+        filterModalData(name);
+    }
     handleModalOk = (e) => {
         console.log(e.target);
-        const { filterModalData } = this.props;
-        filterModalData(this.state.targetKeys);
-        this.setState({
+        let _this=this;
+        _this.filterList();
+        _this.setState({
             visible: false,
         });
     }
@@ -280,36 +272,47 @@ class NotMainBrand extends Component{
     //穿梭框
     handleChange = (nextTargetKeys, direction, moveKeys) => {
         this.setState({ targetKeys: nextTargetKeys });
-
-        console.log('targetKeys: ', nextTargetKeys);
-        console.log('direction: ', direction);
-        console.log('moveKeys: ', moveKeys);
+        // console.log('targetKeys: ', nextTargetKeys);
+        // console.log('direction: ', direction);
+        // console.log('moveKeys: ', moveKeys);
     }
 
     handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
         this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
 
-        console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-        console.log('targetSelectedKeys: ', targetSelectedKeys);
+        // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
+        // console.log('targetSelectedKeys: ', targetSelectedKeys);
     }
 
     handleScroll = (direction, e) => {
-        console.log('direction:', direction);
-        console.log('target:', e.target);
+        // console.log('direction:', direction);
+        // console.log('target:', e.target);
     }
     // componentWillReceiveProps=(nextProps)=>{
     //     this.setState({
     //         targetKeys:nextProps.mockData.targetKeys
     //     });
     // }
+    brand = ()=>{
+        var _this=this;
+        HttpRequest.getRequest({
+            url: domain.brand,
+            params: {
+                isMain:2,
+                userId:_this.props.id
+            },
+        }, (result)=>{
+            _this.setState({
+                mockData:result.allBrands,
+                targetKeys:result.bindings?result.bindings:[]
+            });
+            _this.filterList();
+
+        })
+    }
     componentDidMount = ()=>{
-        axios.get(domain.roles,{
-            params:{
-            userId:1578
-            }
-        }).then(res=>{
-            console.log(res);
-        });
+
+
     }
     render(){
         return(
@@ -322,14 +325,15 @@ class NotMainBrand extends Component{
                     onCancel={this.handleModalCancel}
                 >
                     <Transfer
-                        dataSource={mockNotMainData}
+                        rowKey={record => record.id}
+                        dataSource={this.state.mockData}
                         titles={this.state.titles}
                         targetKeys={this.state.targetKeys}
                         selectedKeys={this.state.selectedKeys}
                         onChange={this.handleChange}
                         onSelectChange={this.handleSelectChange}
                         onScroll={this.handleScroll}
-                        render={item => item.title}
+                        render={item => item.name}
                     />
                 </Modal>
             </div>

@@ -21,7 +21,10 @@ class SearchForm extends Component{
             joinTypeList:[],
             levelList:[],
             shoplevelList:[],
-            shopStatusList:[]
+            shopStatusList:[],
+            companyList:[],
+            manageList:[],
+            pickList:[],
         };
 
     }
@@ -45,7 +48,6 @@ class SearchForm extends Component{
                 } 
             },
             res=>{
-                console.log(type)
                 if(type=="shop_type"){
                     this.setState({
                         shopTypeList:res
@@ -94,7 +96,7 @@ class SearchForm extends Component{
         this.initSelect('shop_level')
         // 门店状态
         this.initSelect('shop_status')
-}
+    }
     changeProvince(e){
         HttpRequest.getRequest(
             {
@@ -125,16 +127,57 @@ class SearchForm extends Component{
             }
         )
     }
+    // 公司名称模糊匹配
+    searchCompany(e){
+        HttpRequest.getRequest(
+        {
+            url:domain.companyList,
+            params:{
+                keyWord:e
+            } 
+        },
+        res=>{
+            this.setState({
+                companyList:res
+            })
+        }
+        )
+    }
+    // 查询区域经理
+    searchManage(e){
+        HttpRequest.getRequest(
+        {
+            url:domain.shopMangerList,
+            params:{
+            keyWord:e,
+            roleType:1
+            } 
+        },
+        res=>{
+            this.setState({
+            manageList:res
+            })
+        })
+    }
+    // 查询对接人
+    searchPickPerson(e){
+        HttpRequest.getRequest(
+        {
+            url:domain.shopMangerList,
+            params:{
+            keyWord:e,
+            roleType:2
+            } 
+        },
+        res=>{
+            this.setState({
+                pickList:res
+            })
+        })
+    }
     render(){
         const { getFieldDecorator } = this.props.form;
-        const provinceList =this.state.provinceList;
-        const cityList =this.state.cityList;
-        const countyList=this.state.countyList;
-        const shopTypeList=this.state.shopTypeList;
-        const joinTypeList=this.state.joinTypeList;
-        const levelList=this.state.levelList;
-        const shoplevelList=this.state.shoplevelList;
-        const shopStatusList=this.state.shopStatusList;
+        const{provinceList,cityList,countyList,shopTypeList,joinTypeList,levelList,shoplevelList,shopStatusList,companyList,manageList,pickList}=this.state;
 
         return(
             <Form
@@ -228,17 +271,37 @@ class SearchForm extends Component{
                             {getFieldDecorator('organizationName',{rules:[{
                                     required:false,
                                 }],})(
-                                <Input style={{width:200}}   placeholder="请输入公司名称" />
+                                    <Select
+                                    showSearch
+                                    placeholder="请输入公司名称"
+                                    defaultActiveFirstOption={false}
+                                    showArrow={false}
+                                    notFoundContent="暂无相关公司信息"
+                                    allowClear={true}
+                                    filterOption={false}
+                                    onSearch={this.searchCompany.bind(this)}
+                                    style={{ width: 300 }}
+                                  >
+                                    {companyList.length > 0 &&
+                                        companyList.map((item, i) => {
+                                            return (
+                                                <Option key={i} value={item.orgName}>
+                                                    {item.orgName}
+                                                </Option>
+                                            );
+                                        })
+                                    }
+                                  </Select>
                             )}
 
                         </FormItem>
                     </Col>
                     <Col span={8} >
-                        <FormItem label='负责人' labelCol={{span:4}}>
+                        <FormItem label='老板' labelCol={{span:4}}>
                             {getFieldDecorator('principal',{rules:[{
                                     required:false,
                                 }],})(
-                                <Input style={{width:200}}   placeholder="请输入负责人" />
+                                <Input style={{width:200}}   placeholder="请输入老板" />
                             )}
 
                         </FormItem>
@@ -355,7 +418,7 @@ class SearchForm extends Component{
                     </Col>
                     <Col span={8}>
                         <FormItem label='数据状态' labelCol={{span:4}}>
-                            {getFieldDecorator('dataState',{rules:[{
+                            {getFieldDecorator('isDeleted',{rules:[{
                                 required:false,
                                 }],})(
                                 <Select  placeholder='请选择数据状态' allowClear style={{ width: 200 }} >
@@ -371,7 +434,27 @@ class SearchForm extends Component{
                             {getFieldDecorator('areaManager',{rules:[{
                                 required:false,
                                 }],})(
-                                <Input style={{width:200}}   placeholder="请输入区域经理" />
+                                <Select
+                                showSearch
+                                placeholder="请输入区域经理"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                notFoundContent="暂无相关区域经理名称"
+                                allowClear={true}
+                                filterOption={false}
+                                onSearch={this.searchManage.bind(this)}
+                                style={{ width: 300 }}
+                                >
+                                {manageList.length > 0 &&
+                                    manageList.map((item, i) => {
+                                        return (
+                                            <Option key={i} value={item.fullname}>
+                                                {item.fullname}
+                                            </Option>
+                                        );
+                                    })
+                                }
+                                </Select>
                             )}
 
                         </FormItem>
@@ -382,7 +465,27 @@ class SearchForm extends Component{
                                     required: false,
                                     message: 'Input something!',
                                 }],})(
-                                <Input style={{width:200}}   placeholder="请输入招商对接人" />
+                                    <Select
+                                    showSearch
+                                    placeholder="请输入招商对接人"
+                                    defaultActiveFirstOption={false}
+                                    showArrow={false}
+                                    notFoundContent="暂无相关招商对接人名称"
+                                    allowClear={true}
+                                    filterOption={false}
+                                    onSearch={this.searchPickPerson.bind(this)}
+                                    style={{ width: 300 }}
+                                  >
+                                    {pickList.length > 0 &&
+                                        pickList.map((item, i) => {
+                                            return (
+                                                <Option key={i} value={item.fullname}>
+                                                    {item.fullname}
+                                                </Option>
+                                            );
+                                        })
+                                    }
+                                  </Select>
                             )}
 
                         </FormItem>

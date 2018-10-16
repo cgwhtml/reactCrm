@@ -5,7 +5,7 @@
 .m-right(@param) {
   margin-bottom: @param;
 }
-.icon-asterisk{
+.icon-asterisk:before{
   display: inline-block;
   margin-right: 4px;
   content: "*";
@@ -14,7 +14,19 @@
   font-size: 14px;
   color: #f5222d;
 }
-
+.required{
+  .ant-form-item-label{
+    label:before{
+      display: inline-block;
+      margin-right: 4px;
+      content: "*";
+      font-family: SimSun;
+      line-height: 1;
+      font-size: 14px;
+      color: #f5222d;
+    }
+  }
+}
 
 
 
@@ -36,3 +48,64 @@
     }
   }
 }
+
+/**  tabs-start **/
+.user-tabs-button{
+  .tabs-bar{
+    border-bottom: 1px solid #e8e8e8;
+    margin: 0 0 16px 0;
+    outline: none;
+    -webkit-transition: padding 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: padding 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: padding 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+  .ant-radio-button-wrapper{
+    margin: 0;
+    border: 1px solid #e8e8e8;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0!important;
+    background: #fafafa;
+    padding: 0 16px;
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    line-height: 38px;
+    height: 100%;
+  }
+  .ant-radio-button-wrapper-checked{
+    background: #fff;
+    border-color: #e8e8e8!important;
+    color: #1DA57A;
+    padding-bottom: 1px;
+    box-shadow: -1px 0 0 0 #e8e8e8;
+  }
+  .ant-radio-button-wrapper-checked:hover {
+    border-color: #e8e8e8;
+    -webkit-box-shadow: -1px 0 0 0 #e8e8e8;
+    box-shadow: -1px 0 0 0 #e8e8e8;
+    color: #3db389;
+  }
+  .ant-radio-button-wrapper:not(:first-child){
+    border-left:none;
+  }
+  .ant-radio-button-wrapper:not(:first-child)::before {
+    content: "";
+    display: block;
+    top: 0;
+    left: -1px;
+    width: 0;
+    height: 0;
+    position: absolute;
+    background-color: #d9d9d9;
+  }
+}
+/**  tabs-end **/
+
+/** 滚动条-start **/
+.scrollbar{
+  border: 1px solid rgb(217, 217, 217);
+  height: 200px;
+  width: 300px;
+  overflow-y: scroll;
+}
+/** 滚动条-end **/

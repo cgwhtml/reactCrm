@@ -1,5 +1,5 @@
 import React , { Component } from 'react';
-import { Switch,Route } from 'react-router-dom';
+import { Switch,Route,BrowserRouter } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
 const MyLoadingComponent = ({ isLoading, error }) => {
@@ -13,6 +13,12 @@ const MyLoadingComponent = ({ isLoading, error }) => {
         return null;
     }
 };
+
+
+const Index = Loadable({
+    loader: () => import('../components/layouts/layout'),
+    loading: MyLoadingComponent
+});
  /***            门店管理             **/
 //列表
 const Manage = Loadable({
@@ -38,6 +44,8 @@ const WrappedModify = Loadable({
 });
 
 const routes=[
+    // { path :'/',component:Index,exact:true},
+    // { path :'/system',component:Index},
     { path :'/',component:Manage,exact:true},
     { path :'/userControl',component:UserControl},
     { path :'/editAddShop',component:editAddShop},

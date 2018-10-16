@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink,BrowserRouter } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
-import PropTypes from 'prop-types';
 import axios from 'axios';
 
 
@@ -14,11 +13,6 @@ import '../../utils/style/common.less'
 
 const { Header, Sider, Content ,Footer} = Layout;
 const SubMenu = Menu.SubMenu;
-
-
-
-
-
 
 
 class SiderDemo extends Component {
@@ -68,19 +62,26 @@ class SiderDemo extends Component {
     }
     render() {
         return (
+        <BrowserRouter
+            // basename="/system"
+            basename="/"
+            forceRefresh={false}
+            keyLength={12}
+        >
             <Layout>
+       
                 <TooltipModal ref='getToolModal' content={this.state.content} ></TooltipModal>
                 <Sider
                     trigger={null}
                     collapsible
                     collapsed={this.state.collapsed}
                 >
-                    <img src={logo} width={80}  alt="logo" className="logo" />
+                    <img src={require('../../utils/image/logo-system.png')} width={120}   alt="logo" className="logo" />
                     <Menu
                         onClick={this.handleClick}
                         theme="dark"
-                        defaultSelectedKeys={['1']}
-                        defaultOpenKeys={['sub1']}
+                        // defaultSelectedKeys={['1']}
+                        // defaultOpenKeys={['sub1']}
                         mode="inline"
                     >
                         <SubMenu key="sub1" title={<span><Icon type="mail" /><span>主页</span></span>}>
@@ -90,14 +91,14 @@ class SiderDemo extends Component {
                             <Menu.Item key="2">
                                 <NavLink exact to='/userControl'>用户管理</NavLink>
                             </Menu.Item>
-                            <SubMenu key="g1" title="系统管理">
-                                <Menu.Item key="3">
-                                    <NavLink exact to='/'>门店管理</NavLink>
-                                </Menu.Item>
-                                <Menu.Item key="4">
-                                    <NavLink exact to='/userControl'>用户管理</NavLink>
-                                </Menu.Item>
-                            </SubMenu>
+                            {/*<SubMenu key="g1" title="系统管理">*/}
+                                {/*<Menu.Item key="3">*/}
+                                    {/*<NavLink exact to='/'>门店管理</NavLink>*/}
+                                {/*</Menu.Item>*/}
+                                {/*<Menu.Item key="4">*/}
+                                    {/*<NavLink exact to='/userControl'>用户管理</NavLink>*/}
+                                {/*</Menu.Item>*/}
+                            {/*</SubMenu>*/}
                         </SubMenu>
                     </Menu>
                 </Sider>
@@ -111,13 +112,14 @@ class SiderDemo extends Component {
                     </Header>
                     <Content style={{ margin: '0 16px'}}>
                         <MainRoutes></MainRoutes>
-
                     </Content>
-                    <Footer style={{ textAlign: 'center' }}>
-                        Ant Design ©2018 Created by Ant UED
-                    </Footer>
+                    {/*<Footer style={{ textAlign: 'center' }}>*/}
+                        {/*/!*Ant Design ©2018 Created by Ant UED*!/*/}
+                    {/*</Footer>*/}
                 </Layout>
+                
             </Layout>
+            </BrowserRouter>
         );
     }
 }

@@ -111,7 +111,7 @@ class AdvancedSearchForm extends React.Component {
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="id" style={{display: "flex"}}>
+            <FormItem label="ID" style={{display: "flex"}}>
               {getFieldDecorator(`id`)(
                 <Input placeholder="请输入id" style={{ width: 200 }}/>  
               )}
@@ -231,7 +231,8 @@ class AdvancedSearchForm extends React.Component {
               清除
             </Button>
             <Button style={{ marginLeft: 8 }}>
-              <NavLink exact to='/modify'>新增</NavLink>
+              {/*<NavLink exact to='/modify' >新增</NavLink>*/}
+              <NavLink exact to={{pathname:'/modify',state:{operateType: 1,id:""}}}>新增新增新增</NavLink>
             </Button>
           </Col>
         </Row>

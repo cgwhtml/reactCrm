@@ -28,21 +28,22 @@ class Manage extends Component {
             pageCur: 1
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'key', width: 100 },
-            { title: 'id', dataIndex: 'id', key: 'id', width: 100 },
-            { title: '登录账号', dataIndex: 'loginId', key: 'loginId', width: 100},
+            { title: '序号', dataIndex: 'key', key: 'key',fixed: 'left', width: 100 },
+            { title: 'ID', dataIndex: 'id', key: 'id', width: 100 },
+            { title: '登录账号', dataIndex: 'loginId', key: 'loginId', width: 150},
             { title: '姓名', dataIndex: 'fullname', key: 'fullname', width: 150},
             { title: '工作岗位', dataIndex: 'positionTitle', key: 'positionTitle', width: 150 },
-            { title: '部门', dataIndex: 'departmentName', key: 'departmentName', width: 150 },
+            { title: '部门', dataIndex: 'departmentName', key: 'departmentName', width: 200 },
             { title: '部门职务', dataIndex: 'jobTitle', key: 'jobTitle', width: 150 },
-            { title: '门店', dataIndex: 'shopName', key: 'shopName', width: 150 },
+            { title: '门店', dataIndex: 'shopName', key: 'shopName', width: 200 },
             { title: '锁定', dataIndex: 'isLockedName', key: 'isLockedName', width: 150 },
             { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName', width: 150 },
-            { title: '更新日期', dataIndex: 'updatedAt', key: 'updatedAt' , width: 150},
+            { title: '更新日期', dataIndex: 'updatedAt', key: 'updatedAt' , width: 250},
             { title: '更新人', dataIndex: 'updatedName', key: 'updatedName', width: 150 },
             {
                 title: '操作',
                 key: 'operation',
+                fixed: 'right',
                 width: 300,
                 render: (text, record,index) =>(<div>
                      {record.isLocked==0 ?
@@ -60,16 +61,19 @@ class Manage extends Component {
                             </Button>        
                         )
                     }
-                    <Button onClick={() =>this.handleRevampClick(text, record,index)}>修改</Button>
+
+                    <Button style={{marginLeft:'10px'}}>
+                        <NavLink exact to={{pathname:'/modify',state:{operateType: 2,id:record.id}}}>修改</NavLink>
+                    </Button>
                     {record.isDelete==0 ?
                         (
-                            <Button type="danger" style={{display:'inline-block'}} >
+                            <Button type="danger" style={{display:'inline-block',marginLeft:'10px'}}>
                                 <Popconfirm title="确定删除吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >删除</a>
                                 </Popconfirm>
                             </Button>
                         ):(
-                            <Button type="danger" style={{display:'inline-block'}}>
+                            <Button type="danger" style={{display:'inline-block',marginLeft:'10px'}}>
                                 <Popconfirm title="确定恢复吗?" onConfirm={() => this.handleDeleteClick(record)}>
                                     <a href="javascript:void(0)" >恢复</a>
                                 </Popconfirm>
@@ -81,17 +85,13 @@ class Manage extends Component {
         ];
     }
 
-     //表格
-     handleRevampClick=(text, record, index)=>{
-        window.location.href=`/modify?id=${record.id}`
-    }
     // 初始化列表数据函数
-    initData=(current,pageSize)=>{
+    initData=(current,pageSize,searchValues)=>{
         let obj=Object.assign(
             {
                 pageCur:current?current:this.state.pageCur,
                 pageSize:pageSize?pageSize:this.state.pageSize
-            } , this.state.searchValues)
+            } , searchValues)
         HttpRequest.getRequest(
             {
                 url:domain.userList,
@@ -132,18 +132,19 @@ class Manage extends Component {
     handleFilter(values) {
         this.setState({
             searchValues:values
-        })
-        this.initData()
+        },()=>{
+            this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues)
+        })  
     }
     //分页
     handleOnChange(current) {
-        this.initData(current)
+        this.initData(current,'',this.state.searchValues)
     }
     onShowSizeChange(current, pageSize) {
         this.setState({
             pageSize:pageSize
         })
-        this.initData(current,pageSize);
+        this.initData(current,pageSize,this.state.searchValues);
     }
     componentDidMount=()=>{
         this.initData();
@@ -154,6 +155,7 @@ class Manage extends Component {
                 item.shopName=item.shopInfos.map(items=>{
                     return items.shopName    
                 }).join(" , ")
+                item.key+=1;
                 item.isDeleteName=item.isDelete==0?'未删除':'已删除';
                 item.isLockedName=item.isLocked==0?'未锁定':'已锁定';
             })
@@ -181,6 +183,7 @@ class Manage extends Component {
                     <WrappedAdvancedSearchForm filterCallback={this.handleFilter.bind(this)} />
                     <Table
                         columns={this.columns}
+                        scroll={{ x: 1900}}
                         dataSource={data}
                         pagination={pagination}
                     />
