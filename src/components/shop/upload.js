@@ -1,5 +1,5 @@
-import React , {Component}  from 'react';
-import { Upload,Form, Icon, message,Row,Col,Button,Input} from 'antd';
+import React  from 'react';
+import { Upload,Form, Icon, message,Row,Col} from 'antd';
 import {HttpRequest} from '../../utils/js/common';
 import domain from '../../domain/domain';
 require('../../utils/style/upload.css')
@@ -7,13 +7,9 @@ require('../../utils/style/upload.css')
 const FormItem = Form.Item;
 
 function beforeUpload(file) {
-  const isJPG = file.type === 'image/jpeg';
-  if (!isJPG) {
-    message.error('You can only upload JPG file!');
-  }
   const isLt2M = file.size / 1024 / 1024 < 2;
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
+    message.error('上传的图片不能大于2MB!');
   }
   return false;
   
@@ -52,17 +48,24 @@ class Avatar extends React.Component {
     );
     const imageUrl = this.state.fileName;
     return (
-      <Upload
-        name="avatar"
-        listType="picture-card"
-        className="avatar-uploader"
-        action={domain.uploadImg}
-        onChange={this.handleData}
-        showUploadList={false}
-        beforeUpload={beforeUpload}
-      >
-        {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-      </Upload>
+      <div>
+        <Upload
+          name="avatar"
+          listType="picture-card"
+          className="avatar-uploader"
+          action={domain.uploadImg}
+          onChange={this.handleData}
+          showUploadList={false}
+          beforeUpload={beforeUpload}
+        >
+          {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+        </Upload>
+        {
+          imageUrl &&
+            <a href={imageUrl} target="blank" style={{'marginLeft':'200px'}}>查看</a>
+          
+        }
+      </div>
     );
   }
 }
@@ -102,10 +105,10 @@ class uploadPhoto extends React.Component{
           } 
         },
         res=>{
-          if(res.length>0){
+          if(res){
             this.setState({
-              shopPhotoList:res[0],
-          })
+              shopPhotoList:res,
+            })
           }
         }
       )
@@ -117,12 +120,12 @@ class uploadPhoto extends React.Component{
       const { getFieldDecorator } = this.props.form;
       const children = [];
       const shopPhotoList=this.state.shopPhotoList;
-      if(Object.keys(shopPhotoList).length==0 && id){
+      if(Object.keys(shopPhotoList).length===0 && id){
         return;
       }
-      const imgNameList=[{name:'营业执照照片',title:'businessLicenseUrl',required:true},{name:'开户许可证照片',title:'openLicenseUrl',required:true},{name:'门店打款凭证',title:'payCertificateUrl',required:true},
-      {name:'门店场地租赁合同',title:'leaseContractUrl',required:true},{name:'身份证正面',title:'idcardFaceUrl',required:false},{name:'身份证反面',title:'idcardBackUrl',required:false},
-      {name:'门店照片',title:'shopFrontUrl',required:true},{name:'厅内照片',title:'hallUrl',required:true},{name:'团队照片',title:'teamUrl',required:true}]
+      const imgNameList=[{name:'营业执照照片',title:'businessLicenseUrl',required:false},{name:'开户许可证照片',title:'openLicenseUrl',required:false},{name:'门店打款凭证',title:'payCertificateUrl',required:false},
+      {name:'门店场地租赁合同',title:'leaseContractUrl',required:false},{name:'身份证正面',title:'idcardFaceUrl',required:false},{name:'身份证反面',title:'idcardBackUrl',required:false},
+      {name:'门店照片',title:'shopFrontUrl',required:false},{name:'厅内照片',title:'hallUrl',required:false},{name:'团队照片',title:'teamUrl',required:false}]
       imgNameList.map((item,i)=>{
         children.push(
           <Col span={12} key={i}>
@@ -139,6 +142,7 @@ class uploadPhoto extends React.Component{
             </FormItem>
           </Col>
         );
+        return children;
       })
       return children;
     }

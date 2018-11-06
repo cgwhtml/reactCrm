@@ -14,8 +14,8 @@ class addressList extends Component {
             rows:[],
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'key', width: 100 },
-            { title: '收车地址', dataIndex: 'detail', key: 'detail', width: 100 },
+            { title: '序号', dataIndex: 'key', key: 'key', width: 50 },
+            { title: '收车地址', dataIndex: 'detail', key: 'detail', width: 250 },
             { title: '联系人', dataIndex: 'receiverName', key: 'receiverName', width: 100},
             { title: '联系电话', dataIndex: 'receiverMobile', key: 'receiverMobile', width: 150},
             { title: '录入日期', dataIndex: 'createdAt', key: 'createdAt', width: 150 },
@@ -46,9 +46,12 @@ class addressList extends Component {
     }
     handleData=(res)=>{
         if(res){
-            this.setState({
-                rows: res
-            })
+	    	  res.map(item=>{
+	              item.key+=1;
+	          })
+	        this.setState({
+	            rows: res
+	        })
         }
     }
     render() {

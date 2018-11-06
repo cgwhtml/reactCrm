@@ -14,8 +14,8 @@ class invoiceInfoList extends Component {
             rows:[],
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'key', width: 100 },
-            { title: '单位名称', dataIndex: 'companyName', key: 'companyName', width: 100 },
+            { title: '序号', dataIndex: 'key', key: 'key', width: 50 },
+            { title: '单位名称', dataIndex: 'companyName', key: 'companyName', width: 200 },
             { title: '纳税人识别号', dataIndex: 'taxpayerNumber', key: 'taxpayerNumber', width: 100},
             { title: '开户银行', dataIndex: 'openingBank', key: 'openingBank', width: 150 },
             { title: '银行账号', dataIndex: 'account', key: 'account', width: 150 },
@@ -49,6 +49,9 @@ class invoiceInfoList extends Component {
     }
     handleData=(res)=>{
         if(res){
+      	  res.map(item=>{
+              item.key+=1;
+          })
             this.setState({
                 rows: res
             })

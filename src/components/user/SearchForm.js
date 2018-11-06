@@ -11,7 +11,7 @@ const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
 
-class AdvancedSearchForm extends React.Component {
+class SearchForm extends React.Component {
 
   constructor(props){
     super(props);
@@ -28,6 +28,7 @@ class AdvancedSearchForm extends React.Component {
   handleSearch = (e) => {
       e.preventDefault();
       this.props.form.validateFields((err, values) => {
+        console.log(values)
           const { filterCallback } = this.props;
           filterCallback(values);
       });
@@ -36,7 +37,7 @@ class AdvancedSearchForm extends React.Component {
   handleReset = () => {
     this.props.form.resetFields();
   }
-  componentDidMount(){
+  componentDidMount(e){
     HttpRequest.getRequest(
         {
             url:domain.departmentTreeList,
@@ -50,6 +51,22 @@ class AdvancedSearchForm extends React.Component {
           })
         }
     )
+    // 角色查询
+    HttpRequest.getRequest(
+      {
+          url:domain.allRole
+      },
+      res=>{
+        this.setState({
+          roleDataSources:res?res:[]
+        })
+      }
+    )
+  }
+  componentWillUnmount = () => {
+    this.setState = (state,callback)=>{
+      return;
+    };
   }
   // 门店模糊查询
   handleShopSearch(e){
@@ -67,29 +84,13 @@ class AdvancedSearchForm extends React.Component {
       }
     )
   }
-  // 角色模糊查询
-  handleVagueSearch(e){
-    HttpRequest.getRequest(
-      {
-          url:domain.roleSearchList,
-          params:{
-            type:2,
-            searchParam:e
-          },
-      },
-      res=>{
-        this.setState({
-          roleDataSources:res.data?res.data:[]
-        })
-      }
-    )
-  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
     const departmentTreeList=this.state.departmentTreeList;
     const roleDataSources=this.state.roleDataSources;
     const shopDataSources=this.state.shopDataSources;
+    const   formItemLayout={labelCol: { span:4}}
     return (
       <Form
         className="ant-advanced-search-form wrappedAdvancedSearchForm"
@@ -97,28 +98,28 @@ class AdvancedSearchForm extends React.Component {
       >
         <Row gutter={24}>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="登录账号" style={{display: "flex"}}>
+            <FormItem label="登录账号" {...formItemLayout}>
               {getFieldDecorator(`loginId`)(
                 <Input placeholder="请输入登录账号" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="姓名" style={{display: "flex"}}>
+            <FormItem label="姓名" {...formItemLayout}>
               {getFieldDecorator(`fullname`)(
                 <Input placeholder="请输入姓名" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="ID" style={{display: "flex"}}>
+            <FormItem label="ID" {...formItemLayout}>
               {getFieldDecorator(`id`)(
                 <Input placeholder="请输入id" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="所属部门" style={{display: "flex"}}>
+            <FormItem label="所属部门" {...formItemLayout}>
               {getFieldDecorator(`departmentId`)(
                  <TreeSelect
                  style={{ width: 200 }}
@@ -133,7 +134,7 @@ class AdvancedSearchForm extends React.Component {
                   {departmentTreeList.length > 0 &&
                       departmentTreeList.map((item, i) => {
                           return (
-                              <TreeNode value={item.id} title={item.name} key={i} disabled>
+                              <TreeNode value={item.id} title={item.name} key={i}>
                                  {item.subDepartment.length >0 && 
                                   item.subDepartment.map((items,j)=>{
                                     return (
@@ -150,7 +151,7 @@ class AdvancedSearchForm extends React.Component {
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="所属门店" style={{display: "flex"}}>
+            <FormItem label="所属门店" {...formItemLayout}>
               {getFieldDecorator(`shopName`)(
                 <Select
                   showSearch
@@ -177,18 +178,15 @@ class AdvancedSearchForm extends React.Component {
             </FormItem>
           </Col>
           <Col span={8} style={{ textAlign: 'left'}}>
-            <FormItem label="角色" style={{display: "flex"}}>
+            <FormItem label="角色" {...formItemLayout}>
               {getFieldDecorator(`roleId`)(
                   <Select
                   showSearch
                   placeholder="请输入角色名称"
                   allowClear={true}
-                  defaultActiveFirstOption={false}
-                  showArrow={false}
-                  filterOption={false}
-                  onSearch={this.handleVagueSearch.bind(this)}
                   notFoundContent="暂无相关角色信息"
                   style={{ width: 200 }}
+                  filterOption={(input, option) => option.props.children.indexOf(input) >= 0}
                 >
                   {roleDataSources.length > 0 &&
                       roleDataSources.map((item, i) => {
@@ -204,27 +202,27 @@ class AdvancedSearchForm extends React.Component {
             </FormItem>
           </Col>
           <Col span={8}>
-            <FormItem label="已锁定" labelCol={{span:2}}>
-              {getFieldDecorator(`isLocked`)(
+            <FormItem label="已锁定" {...formItemLayout}>
+              {getFieldDecorator(`isLocked`, {initialValue:"0"})(
                 <RadioGroup>
-                  <Radio value={0}>未锁定</Radio>
-                  <Radio value={1}>锁定</Radio>
+                  <Radio value="1">是</Radio>
+                  <Radio value="0">否</Radio>
                 </RadioGroup>
               )}
             </FormItem>
           </Col>
           <Col span={8}>
-            <FormItem label="已删除" labelCol={{span:2}}>
-              {getFieldDecorator(`isDeleted`)(
+            <FormItem label="已删除" {...formItemLayout}>
+              {getFieldDecorator(`isDeleted`, {initialValue:"0"})(
                 <RadioGroup>
-                  <Radio value="0">未删除</Radio>
-                  <Radio value="1">已删除</Radio>
+                  <Radio value="1">是</Radio>
+                  <Radio value="0">否</Radio>
                 </RadioGroup>  
               )}
             </FormItem>
           </Col>
         </Row>
-        <Row>
+        <Row className='row-bottom'>
           <Col span={24} style={{ textAlign: 'right' }}>
             <Button htmlType="submit">查询</Button>
             <Button type="danger"  style={{ marginLeft: 8 }} onClick={this.handleReset}>
@@ -232,7 +230,7 @@ class AdvancedSearchForm extends React.Component {
             </Button>
             <Button style={{ marginLeft: 8 }}>
               {/*<NavLink exact to='/modify' >新增</NavLink>*/}
-              <NavLink exact to={{pathname:'/modify',state:{operateType: 1,id:""}}}>新增新增新增</NavLink>
+              <NavLink exact to={{pathname:'/userEdit/1'}}>新增</NavLink>
             </Button>
           </Col>
         </Row>
@@ -241,6 +239,6 @@ class AdvancedSearchForm extends React.Component {
   }
 }
 
-const WrappedAdvancedSearchForm = Form.create()(AdvancedSearchForm);
+const WrappedSearchForm = Form.create()(SearchForm);
 
-export default  WrappedAdvancedSearchForm;
+export default  WrappedSearchForm;

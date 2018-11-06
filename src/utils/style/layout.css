@@ -28,6 +28,7 @@
     -webkit-transition: all 1s;
     -o-transition: all 1s;
     transition: all 1s;
+    width: 55%;
 }
 /*链接符-*/
 .icon-connectors{

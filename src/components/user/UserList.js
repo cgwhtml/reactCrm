@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import BreadcrumbItems from '../layouts/BreadcrumbItems';
-import WrappedAdvancedSearchForm from './WrappedAdvancedSearchForm'
+import WrappedSearchForm from './SearchForm'
 import PropTypes from 'prop-types';
 import { Table,Button,Popconfirm} from 'antd';
 import { NavLink } from 'react-router-dom';
@@ -13,7 +13,7 @@ const itemText = {
     item3: '用户管理'
 };
 
-class Manage extends Component {
+class UserList extends Component {
     static propTypes = {
         itemText: PropTypes.object
     }
@@ -28,7 +28,7 @@ class Manage extends Component {
             pageCur: 1
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'key',fixed: 'left', width: 100 },
+            { title: '序号', dataIndex: 'key', key: 'key',fixed: 'left', width: 70 },
             { title: 'ID', dataIndex: 'id', key: 'id', width: 100 },
             { title: '登录账号', dataIndex: 'loginId', key: 'loginId', width: 150},
             { title: '姓名', dataIndex: 'fullname', key: 'fullname', width: 150},
@@ -36,15 +36,15 @@ class Manage extends Component {
             { title: '部门', dataIndex: 'departmentName', key: 'departmentName', width: 200 },
             { title: '部门职务', dataIndex: 'jobTitle', key: 'jobTitle', width: 150 },
             { title: '门店', dataIndex: 'shopName', key: 'shopName', width: 200 },
-            { title: '锁定', dataIndex: 'isLockedName', key: 'isLockedName', width: 150 },
-            { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName', width: 150 },
-            { title: '更新日期', dataIndex: 'updatedAt', key: 'updatedAt' , width: 250},
+            { title: '锁定', dataIndex: 'isLockedName', key: 'isLockedName', width: 80 },
+            { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName', width: 80 },
+            { title: '更新日期', dataIndex: 'updatedAt', key: 'updatedAt' , width: 200},
             { title: '更新人', dataIndex: 'updatedName', key: 'updatedName', width: 150 },
             {
                 title: '操作',
                 key: 'operation',
                 fixed: 'right',
-                width: 300,
+                width: 250,
                 render: (text, record,index) =>(<div>
                      {record.isLocked==0 ?
                         (
@@ -63,7 +63,7 @@ class Manage extends Component {
                     }
 
                     <Button style={{marginLeft:'10px'}}>
-                        <NavLink exact to={{pathname:'/modify',state:{operateType: 2,id:record.id}}}>修改</NavLink>
+                        <NavLink exact to={`/userEdit/2/${record.id}`}>修改</NavLink>
                     </Button>
                     {record.isDelete==0 ?
                         (
@@ -91,7 +91,7 @@ class Manage extends Component {
             {
                 pageCur:current?current:this.state.pageCur,
                 pageSize:pageSize?pageSize:this.state.pageSize
-            } , searchValues)
+            } , searchValues?searchValues:{isLocked:0,isDeleted:0})
         HttpRequest.getRequest(
             {
                 url:domain.userList,
@@ -147,7 +147,13 @@ class Manage extends Component {
         this.initData(current,pageSize,this.state.searchValues);
     }
     componentDidMount=()=>{
-        this.initData();
+        // this.initData();
+        this.handleFilter();
+    }
+    componentWillUnmount = () => {
+        this.setState = (state,callback)=>{
+          return;
+        };
     }
     handleData=(res,pageSize)=>{
         if(res.data){
@@ -156,8 +162,8 @@ class Manage extends Component {
                     return items.shopName    
                 }).join(" , ")
                 item.key+=1;
-                item.isDeleteName=item.isDelete==0?'未删除':'已删除';
-                item.isLockedName=item.isLocked==0?'未锁定':'已锁定';
+                item.isDeleteName=item.isDelete==0?'':'已删除';
+                item.isLockedName=item.isLocked==0?'':'已锁定';
             })
             this.setState({
                 rows: res
@@ -180,7 +186,7 @@ class Manage extends Component {
             <div>
                 <BreadcrumbItems itemText={itemText}></BreadcrumbItems>
                 <div style={{ padding: 24, background: '#fff', minHeight: 380 }}>
-                    <WrappedAdvancedSearchForm filterCallback={this.handleFilter.bind(this)} />
+                    <WrappedSearchForm filterCallback={this.handleFilter.bind(this)} />
                     <Table
                         columns={this.columns}
                         scroll={{ x: 1900}}
@@ -192,4 +198,4 @@ class Manage extends Component {
         )
     }
 }
-export default Manage;
+export default UserList;

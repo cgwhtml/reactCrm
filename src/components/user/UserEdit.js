@@ -2,7 +2,7 @@
 import React , {Component} from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
-import { Form, Row, Col, Input, Button, Select, Icon, Tree, TreeSelect,AutoComplete,Radio   } from 'antd';
+import { Form, Row, Col, Input, Button, Select, Icon, Tree, TreeSelect,AutoComplete,Radio,Modal} from 'antd';
 
 import {HttpRequest,Check} from '../../utils/js/common'
 import BreadcrumbItems from '../layouts/BreadcrumbItems';
@@ -19,12 +19,12 @@ const TreeNode = Tree.TreeNode;
 const itemText={
                     item1:'主页',
                     item2:'系统管理',
-                    item3:'添加/修改门店信息'
+                    item3:'添加/修改用户信息'
                 };
 const formColLayout12 = {xxl: { span:12 },};
 const formColLayout6 = {xxl: { span:6 },};
 
-class Modify extends Component{
+class UserEdit extends Component{
     static propTypes={
         itemText: PropTypes.object,
     }
@@ -109,7 +109,7 @@ class Modify extends Component{
         let roleName=[],roleId=[],isArea=[],isPurchase=[],isShop=[];
         let _this=this;
         let isDisabled=_this.state.isDisabled;
-        value.map(item=>{
+        value.map(item=>{//eslint-disable-line
             roleName.push(item.name);
             roleId.push(item.id);
             isArea.push(item.isArea);
@@ -143,14 +143,14 @@ class Modify extends Component{
                 * isArea 区域属性
                 * */
                 for(let keyWord in isDisabled){
-                    if(isDisabled[keyWord]==='true'){
+                    if(isDisabled[keyWord]==='true'){//eslint-disable-line
                         return keyWord;
                     }
                 }
             })()
         },()=>{
             // let isDisabled=_this.state.isDisabled;
-            if(isDisabled.isShop=='false' && isDisabled.isPurchase=='true' ){
+            if(isDisabled.isShop=='false' && isDisabled.isPurchase=='true' ){//eslint-disable-line
                 _this.refs.getMasterButton.brand();
                 _this.refs.getNotMainButton.brand();
                 _this.setState({
@@ -167,7 +167,7 @@ class Modify extends Component{
     gainMasterData=(name)=>{
         let lists=[],_this=this;
         let masterName=[],masterId=[];
-        name.map(item=>{
+        name.map(item=>{//eslint-disable-line
             item.level='1000';
             item.isLeaf=0;
             lists.push([item]);
@@ -190,7 +190,7 @@ class Modify extends Component{
                 let checkedMasterTree=_this.state.checkedMasterTree;
                 for(let key in checkedMasterTree){
                     let hasVal=name.filter(p=>{
-                        return p.id==key;
+                        return p.id==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -202,7 +202,7 @@ class Modify extends Component{
                 let treeMasterCheckedKeys=_this.state.treeMasterCheckedKeys;
                 for(let key in treeMasterCheckedKeys){
                     let hasVal=name.filter(p=>{
-                        return p.id==key;
+                        return p.id==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete treeMasterCheckedKeys[key];
@@ -231,23 +231,23 @@ class Modify extends Component{
             checkedMasterTree=_this.state.checkedMasterTree,
             treeMasterCheckedKeys=_this.state.treeMasterCheckedKeys;
         let brandRoot1=checkedObj.filter(item=>{
-            item=eval('('+ item +')');
-            return item.level=='1000'
+            item=eval('('+ item +')');//eslint-disable-line
+            return item.level=='1000'//eslint-disable-line
         });
         let brandRoot2=halfCheckedKeys.filter(item=>{
-            item=eval('('+ item +')');
-            return item.level=='1000'
+            item=eval('('+ item +')');//eslint-disable-line
+            return item.level=='1000'//eslint-disable-line
         });
         let checkedDefault=[],checkedDefaultList=[];//选中复选框后，重新选择品牌后 树的默认值 [brandId:key/key]
         brandRoot=brandRoot1.length>0 ? brandRoot1 :brandRoot2;
-        brandRoot=eval('('+ brandRoot[0] +')');
-        brandId.map(n=>{
-            n=eval('('+ n +')');
-            if(brandRoot!=undefined && n.brandId==brandRoot.id){
-                checkedObj.map(p=>{
+        brandRoot=eval('('+ brandRoot[0] +')');//eslint-disable-line
+        brandId.map(n=>{//eslint-disable-line
+            n=eval('('+ n +')');//eslint-disable-line
+            if(brandRoot!=undefined && n.brandId==brandRoot.id){//eslint-disable-line
+                checkedObj.map(p=>{//eslint-disable-line
                     checkedDefault.push(p);
                     p=eval('('+ p +')');
-                    if(p.isLeaf==1){
+                    if(p.isLeaf==1){//eslint-disable-line
                         checkedKeysL.push(p.id);
                     }
                 })
@@ -258,11 +258,11 @@ class Modify extends Component{
         _this.setState({
             checkedMasterTree:(()=>{
                 let checkedKey='',checkedCount='';
-                if(msg.length==0){
+                if(msg.length===0){
                     checkedKey=currentRootKey;
                     checkedCount='';
                 }else{
-                    msg.map(item=>{
+                    msg.map(item=>{//eslint-disable-line
                         item=eval('('+ item +')');
                         for(let key in item){
                             checkedKey=key;
@@ -273,8 +273,8 @@ class Modify extends Component{
                 checkedMasterTree[checkedKey]=checkedCount;
                 for(let key in checkedMasterTree){
                     let hasVal=brandId.filter(p=>{
-                                p=eval('('+ p +')');
-                                return p.brandId==key;
+                                p=eval('('+ p +')');//eslint-disable-line
+                                return p.brandId==key;//eslint-disable-line
                             });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -284,12 +284,12 @@ class Modify extends Component{
             })(),
             treeMasterCheckedKeys:(()=>{
                 let checkedKey='',checkedCount='';
-                if(checkedDefaultList.length==0){
+                if(checkedDefaultList.length===0){
                     checkedKey=currentRootKey;
                     checkedCount='';
                 }else{
-                    checkedDefaultList.map(item=>{
-                        item=eval('('+ item +')');
+                    checkedDefaultList.map(item=>{//eslint-disable-line
+                        item=eval('('+ item +')');//eslint-disable-line
                         for(let key in item){
                             checkedKey=key;
                             checkedCount=item[key];
@@ -299,8 +299,8 @@ class Modify extends Component{
                 treeMasterCheckedKeys[checkedKey]=checkedCount;
                 for(let key in treeMasterCheckedKeys){
                     let hasVal=brandId.filter(p=>{
-                        p=eval('('+ p +')');
-                        return p.brandId==key;
+                        p=eval('('+ p +')');//eslint-disable-line
+                        return p.brandId==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -319,7 +319,7 @@ class Modify extends Component{
 
         let lists=[],_this=this;
         let masterName=[],masterId=[];
-        name.map(item=>{
+        name.map(item=>{//eslint-disable-line
             item.level='1000';
             item.isLeaf=0;
             lists.push([item]);
@@ -342,7 +342,7 @@ class Modify extends Component{
                 let checkedMasterTree=_this.state.checkedNotMainTree;
                 for(let key in checkedMasterTree){
                     let hasVal=name.filter(p=>{
-                        return p.id==key;
+                        return p.id==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -354,7 +354,7 @@ class Modify extends Component{
                 let treeMasterCheckedKeys=_this.state.treeNotMainCheckedKeys;
                 for(let key in treeMasterCheckedKeys){
                     let hasVal=name.filter(p=>{
-                        return p.id==key;
+                        return p.id==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete treeMasterCheckedKeys[key];
@@ -382,23 +382,23 @@ class Modify extends Component{
             checkedMasterTree=_this.state.checkedNotMainTree,
             treeMasterCheckedKeys=_this.state.treeNotMainCheckedKeys;
         let brandRoot1=checkedObj.filter(item=>{
-            item=eval('('+ item +')');
-            return item.level=='1000'
+            item=eval('('+ item +')');//eslint-disable-line
+            return item.level=='1000'//eslint-disable-line
         });
         let brandRoot2=halfCheckedKeys.filter(item=>{
-            item=eval('('+ item +')');
-            return item.level=='1000'
+            item=eval('('+ item +')');//eslint-disable-line
+            return item.level=='1000'//eslint-disable-line
         });
         let checkedDefault=[],checkedDefaultList=[];//选中复选框后，重新选择品牌后 树的默认值 [brandId:key/key]
         brandRoot=brandRoot1.length>0 ? brandRoot1 :brandRoot2;
-        brandRoot=eval('('+ brandRoot[0] +')');
+        brandRoot=eval('('+ brandRoot[0] +')');//eslint-disable-line
         brandId.map(n=>{
-            n=eval('('+ n +')');
-            if(brandRoot!=undefined && n.brandId==brandRoot.id){
+            n=eval('('+ n +')');//eslint-disable-line
+            if(brandRoot!=undefined && n.brandId==brandRoot.id){//eslint-disable-line
                 checkedObj.map(p=>{
                     checkedDefault.push(p);
-                    p=eval('('+ p +')');
-                    if(p.isLeaf==1){
+                    p=eval('('+ p +')');//eslint-disable-line
+                    if(p.isLeaf==1){//eslint-disable-line
                         checkedKeysL.push(p.id);
                     }
                 })
@@ -410,12 +410,12 @@ class Modify extends Component{
         _this.setState({
             checkedNotMainTree:(()=>{
                 let checkedKey='',checkedCount='';
-                if(msg.length==0){
+                if(msg.length==0){//eslint-disable-line
                     checkedKey=currentRootKey;
                     checkedCount='';
                 }else{
                     msg.map(item=>{
-                        item=eval('('+ item +')');
+                        item=eval('('+ item +')');//eslint-disable-line
                         for(let key in item){
                             checkedKey=key;
                             checkedCount=item[key];
@@ -425,8 +425,8 @@ class Modify extends Component{
                 checkedMasterTree[checkedKey]=checkedCount;
                 for(let key in checkedMasterTree){
                     let hasVal=brandId.filter(p=>{
-                        p=eval('('+ p +')');
-                        return p.brandId==key;
+                        p=eval('('+ p +')');//eslint-disable-line
+                        return p.brandId==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -436,12 +436,12 @@ class Modify extends Component{
             })(),
             treeNotMainCheckedKeys:(()=>{
                 let checkedKey='',checkedCount='';
-                if(checkedDefaultList.length==0){
+                if(checkedDefaultList.length===0){
                     checkedKey=currentRootKey;
                     checkedCount='';
                 }else{
                     checkedDefaultList.map(item=>{
-                        item=eval('('+ item +')');
+                        item=eval('('+ item +')');//eslint-disable-line
                         for(let key in item){
                             checkedKey=key;
                             checkedCount=item[key];
@@ -451,8 +451,8 @@ class Modify extends Component{
                 treeMasterCheckedKeys[checkedKey]=checkedCount;
                 for(let key in treeMasterCheckedKeys){
                     let hasVal=brandId.filter(p=>{
-                        p=eval('('+ p +')');
-                        return p.brandId==key;
+                        p=eval('('+ p +')');//eslint-disable-line
+                        return p.brandId==key;//eslint-disable-line
                     });
                     if(hasVal.length<=0){
                         delete checkedMasterTree[key];
@@ -505,7 +505,7 @@ class Modify extends Component{
                 let disabled= (item.subDepartment &&  item.subDepartment.length>0 ) ? true : false;
                 // disabled={disabled}
                 return(
-                    <TreeNode value={item.id} disabled={disabled}  title={item.name} key={item.id}   dataRef={item}>
+                    <TreeNode value={item.id}  title={item.name} key={item.id}   dataRef={item}>
                         {this.renderDepartmentTreeNodes(item.subDepartment)}
                     </TreeNode>
                 )
@@ -559,7 +559,7 @@ class Modify extends Component{
         })
             .then((res)=>{
                 let data=res.data
-                if(data.error==0){
+                if(data.error===0){
                     let result=data.result;
                     _this.setState({
                         areaTree:result,
@@ -569,7 +569,7 @@ class Modify extends Component{
             })
             .then(()=>{
                 let isDisabled=_this.state.isDisabled;
-                if(isDisabled.isShop=='false' && isDisabled.isPurchase=='true' ){
+                if(isDisabled.isShop=='false' && isDisabled.isPurchase=='true' ){//eslint-disable-line
                     _this.refs.getMasterButton.brand();
                     _this.refs.getNotMainButton.brand();
                     _this.setState({
@@ -583,21 +583,24 @@ class Modify extends Component{
     //重置密码
     passwordReset =() =>{
         let _this=this;
-        let id=_this.props.location.state.id;
+        let id=_this.props.match.params.id;
         HttpRequest.postRequest({
             url:domain.passInit,
             data:{
                 userId:id
             }
         },(res)=>{
-            alert('密码重置成功！')
+            Modal.success({
+                title: '确定',
+                content: `密码重置成功！`,
+            });
         })
     }
     //查询用户详情
     userDetail = ()=>{
         let _this=this;
-        let operateType=_this.props.location.state.operateType;
-        let id=_this.props.location.state.id;
+        let operateType=_this.props.match.params?_this.props.match.params.operateType:'';
+        let id=_this.props.match.params?_this.props.match.params.id:'';
         _this.setState({
             id:id,
         })
@@ -610,7 +613,7 @@ class Modify extends Component{
         },(res)=>{
             this.setState({
                 detailData:res,
-                shopDataSource:[res.shopInfo],
+                shopDataSource:[{id:res.shopId,name:res.shopName}],
                 defaultAreaCheckedKeys:res.areas,
                 password:res.password,
                 defaultMasterCheckedKeys:res.mainBrandAreaInfos,
@@ -645,7 +648,7 @@ class Modify extends Component{
         }
         let _this=this;
         let isDisabled=_this.state.isDisabled;
-        let id=_this.props.location.state.id;
+        let id=_this.props.match.params.id;
         let treeArea=JSON.stringify(_this.state.treeAreaCheckedKeys),
             defaultAreaCheckedKeys=JSON.stringify(_this.state.defaultAreaCheckedKeys);
 
@@ -663,34 +666,42 @@ class Modify extends Component{
             values.responsibleArea= treeArea=='[]' ? defaultAreaCheckedKeys :treeArea;//区域属性
 
             _this.setState({
-                isBrandRequired:values.mainBrandArea=='{}'?'false':'true',
-                isAreaRequired:values.responsibleArea=='[]'?'false':'true',
-                isRoleRequired:values.roles=='[]'?'false':'true'
+                isBrandRequired:values.mainBrandArea=='{}'?'false':'true',//eslint-disable-line
+                isAreaRequired:values.responsibleArea=='[]'?'false':'true',//eslint-disable-line
+                isRoleRequired:values.roles=='[]'?'false':'true'//eslint-disable-line
             })
-            console.log(values, err);
-            let isArea=values.responsibleArea=='[]';
-            let isBrand=values.mainBrandArea=='{}';
-            if(isDisabled.isShop=='false'){
+            let isArea=values.responsibleArea=='[]';//eslint-disable-line
+            let isBrand=values.mainBrandArea=='{}';//eslint-disable-line
+            if(isDisabled.isShop=='false'){//eslint-disable-line
                 if(err!=null)
                 delete err.shopId;
             }
-            if(isDisabled.isArea=='false'){
+            if(isDisabled.isArea=='false'){//eslint-disable-line
                 if(err!=null)
                 isArea=false;
             }
-            if(isDisabled.isPurchase=='false'){
+            if(isDisabled.isPurchase=='false'){//eslint-disable-line
                 delete err.mainJobType;
                 isBrand=false;
             }
-            if((err!=null && Object.keys(err).length != 0) || isArea || isBrand ){
-                alert('必要信息请填写完整！');
+            if((err!=null && Object.keys(err).length !== 0) || isArea || isBrand ){
+                Modal.error({
+                    title: '提示',
+                    content: '必要信息请填写完整！',
+                });
                 return;
             }
             HttpRequest.postRequest({
                 url:domain.addOrUpdate,
                 data:values
             },(res)=>{
-                this.props.history.push("/userControl")
+                Modal.success({
+                    title: '确定',
+                    content: `保存成功！`,
+                    onOk:()=>{
+                        this.props.history.push("/userList");
+                    }
+                });
             })
         });
     }
@@ -704,7 +715,7 @@ class Modify extends Component{
     }
     onRadioChange=(e)=>{
         let _this=this;
-        if(e.target.value=='isPurchase' && _this.state.flag==0){
+        if(e.target.value==='isPurchase' && _this.state.flag==0){//eslint-disable-line
             _this.refs.getMasterButton.brand();
             _this.refs.getNotMainButton.brand();
             _this.setState({
@@ -728,9 +739,9 @@ class Modify extends Component{
         let isShop=_this.state.isDisabled.isShop==="true",
             isPurchase=_this.state.isDisabled.isPurchase==="true",
             isArea=_this.state.isDisabled.isArea==="true",
-            isShopChecked=_this.state.tabsKey=="isShop",
-            isPurchaseChecked=_this.state.tabsKey=="isPurchase",
-            isAreaChecked=_this.state.tabsKey=="isArea";
+            isShopChecked=_this.state.tabsKey=="isShop",//eslint-disable-line
+            isPurchaseChecked=_this.state.tabsKey=="isPurchase",//eslint-disable-line
+            isAreaChecked=_this.state.tabsKey=="isArea";//eslint-disable-line
         return(
             <div>
                 <TooltipModal ref='getToolModal' content={this.state.content} ></TooltipModal>
@@ -741,7 +752,7 @@ class Modify extends Component{
                     >
                         <Row gutter={24}>
                             <Col {...formColLayout12}>
-                                <FormItem label='用户识别号' labelCol={{span:4}} >
+                                <FormItem label='用户ID' labelCol={{span:3}} >
                                     {data.id}
                                 </FormItem>
                             </Col>
@@ -750,7 +761,7 @@ class Modify extends Component{
                                     <TextArea placeholder="请选择角色" value={this.state.roleName.join('/')} style={{ width: 300,marginRight:15 }} autosize disabled />
                                     <Button onClick={this.handleRoleModalBox}>角色分配</Button>
                                     <ModalBox ref="getModalButton" id={_this.state.id}  filterModalData={this.gainRoleData.bind(this)} ></ModalBox>
-                                    <div style={{color: '#f5222d',display:_this.state.isRoleRequired=='true'?'none':'block'}}>请选择主品牌和区域!</div>
+                                    <div style={{color: '#f5222d',display:_this.state.isRoleRequired=='true'?'none':'block'}}>请选择用户角色!</div>
 
                                 </FormItem>
                             </Col>
@@ -804,7 +815,7 @@ class Modify extends Component{
                                             message: '手机号码!',
                                         },{
                                             pattern:/^1\d{10}$/,
-                                            message:'请输入正确的电话号码'
+                                            message:'请输入手机号码'
                                         }],initialValue:data.mobile})(
                                         <Input   style={{maxWidth:200,marginRight:15}}   placeholder="请输入手机号码" />
                                     )}
@@ -813,7 +824,7 @@ class Modify extends Component{
                             <Col {...formColLayout6}>
                                 <FormItem label='身份证' labelCol={{span:6}} wrapperCol={{span:18}}>
                                     {getFieldDecorator('idcard',{rules:[{
-                                            required:true,
+                                            required:false,
                                             validator:Check.idCard,
                                         },{
                                         }],initialValue:data.idcard})(
@@ -859,7 +870,7 @@ class Modify extends Component{
                                             type:'email',
                                             message:'请输入正确的邮箱地址'
                                         }],initialValue:data.email})(
-                                        <Input   style={{maxWidth:200,marginRight:15}}   placeholder="请输入手机号码" />
+                                        <Input   style={{maxWidth:200,marginRight:15}}   placeholder="请输入电子邮箱" />
                                     )}
                                 </FormItem>
                             </Col>
@@ -901,7 +912,7 @@ class Modify extends Component{
                                             {getFieldDecorator('shopId',{rules:[{
                                                     required:true,
                                                     message: '请选择所属门店!',
-                                                }],initialValue:`${(data.shopId || data.shopId==0) ? data.shopId:''}`})(
+                                                }],initialValue:`${(data.shopId || data.shopId==0) ? data.shopId:''}`})(//eslint-disable-line
                                                 <AutoComplete
                                                     style={{ width: 200 }}
                                                     onSelect={this.onShopSelect}
@@ -957,7 +968,7 @@ class Modify extends Component{
                                                         let defaultCheckedTree= data.mainBrandAreaInfos;
                                                         let defaultMasterCheckedKeys=[];
                                                         for(let checkedKey in defaultCheckedTree){
-                                                            if(checkedKey==brandId[index]){
+                                                            if(checkedKey==brandId[index]){//eslint-disable-line
                                                                 defaultMasterCheckedKeys=defaultCheckedTree[checkedKey].map(item=>{
                                                                     return `{'id':${item.id},'isLeaf':${item.isLeaf},'level':${item.level}}`
                                                                 });
@@ -1003,7 +1014,7 @@ class Modify extends Component{
 
                                                         let defaultMasterCheckedKeys=[];
                                                         for(let checkedKey in defaultCheckedTree){
-                                                            if(checkedKey==brandId[index]){
+                                                            if(checkedKey==brandId[index]){//eslint-disable-line
                                                                 defaultMasterCheckedKeys=defaultCheckedTree[checkedKey].map(item=>{
                                                                     return `{'id':${item.id},'isLeaf':${item.isLeaf},'level':${item.level}}`
                                                                 });
@@ -1022,7 +1033,6 @@ class Modify extends Component{
                                                             >
                                                                 {this.renderTreeNodes(item)}
                                                             </Tree>
-
                                                         )
                                                     })
                                                 }
@@ -1062,8 +1072,7 @@ class Modify extends Component{
                             <Col span={24} style={{ textAlign: 'center' }}>
                                 <Button htmlType="submit">保存</Button>
                                 <Button type="danger" style={{ marginLeft: 8 }} onClick={this.handleReset}>
-                                    <NavLink exact to={{pathname:'/userControl'}}>取消</NavLink>
-
+                                    <NavLink exact to={{pathname:'/userList'}}>取消</NavLink>
                                 </Button>
                             </Col>
                         </Row>
@@ -1074,6 +1083,6 @@ class Modify extends Component{
         )
     }
 }
-const WrappedModify= Form.create()(Modify);
+const WrappedUserEdit= Form.create()(UserEdit);
 
-export default WrappedModify;
+export default WrappedUserEdit;

@@ -1,26 +1,27 @@
 import React , {Component}  from 'react';
-import WrappedRegistrationForm  from './basicMsg'
+import RegistrationForm  from './registrationForm'
 import UploadPhotos from './upload'
 import AddressList from './addressList'
 import InvoiceInfoList from './invoiceInfoList'
 import RemittanceAccountList from './remittanceAccountList'
-import {Tabs,Button,Modal} from 'antd';
+import {Tabs,Button,Modal,Row, Col} from 'antd';
 import {HttpRequest} from '../../utils/js/common';
 import domain from '../../domain/domain';
+import { NavLink } from 'react-router-dom';
 require('../../utils/style/editAddShop.css')
 
 const TabPane = Tabs.TabPane;
 
 
-class TabBox extends Component{
+class ShopEdit extends Component{
     constructor(props){
         super(props);
         this.state={
-            key:1,
+            key:"1",
             basicMsg:{},
             uploadImg:{},
             content:'',
-            id:props.location.state?props.location.state.id:''
+            id:props.match.params?props.match.params.id:''
         };   
       }
     callback=(key)=> {
@@ -39,15 +40,15 @@ class TabBox extends Component{
     }
     handleCreate = (e) => {
         let that=this;
-        const id=this.props.location.state?this.props.location.state.id:'';
+        const id=this.props.match.params?this.props.match.params.id:'';
         if(!this.formRefs.handleSubmit(e)){
             this.countDown('请完善基本信息');
             return;
         }
-        if(!this.formRef.handleSubmit2(e)){
-            this.countDown('请完善证件以及照片');
-            return;
-        }
+//        if(!this.formRef.handleSubmit2(e)){
+//            this.countDown('请完善证件以及照片');
+//            return;
+//        }
         const propsBasicMsg=this.formRefs.getItemsValue();
         const uploadImg=this.formRef.getItemsValue2();
         if(propsBasicMsg.joinDate){
@@ -72,9 +73,9 @@ class TabBox extends Component{
                 result=>{
                     Modal.success({
                         title: '确定',
-                        content: `提交成功`,
+                        content: `保存成功！`,
                         onOk:()=>{
-                            window.location.href='/system/'
+                            this.props.history.push("/shopList");
                         }
                     });
                 })
@@ -86,7 +87,7 @@ class TabBox extends Component{
                 <div style={{ padding: 24, background: '#fff',minHeight: 380}}>
                     <Tabs defaultActiveKey="1" onChange={this.callback}>
                         <TabPane tab="基本信息" key="1" forceRender={true}>
-                            <WrappedRegistrationForm  wrappedComponentRef={(form) => this.formRefs = form} id={this.state.id}/>
+                            <RegistrationForm  wrappedComponentRef={(form) => this.formRefs = form} id={this.state.id}/>
                         </TabPane>
                         <TabPane tab="证件及照片" key="2" forceRender={true}>
                             <UploadPhotos wrappedComponentRef={(form) => this.formRef = form} id={this.state.id}/>
@@ -101,13 +102,19 @@ class TabBox extends Component{
                             <InvoiceInfoList id={this.state.id}/>
                         </TabPane>
                     </Tabs>
-                    {this.state.key==1 || this.state.key==2?(<div  style={{textAlign:"center"}}>
-                        <Button type="primary">取消</Button>
-                        <Button type="primary" htmlType="submit" style={{marginLeft:'30px'}} onClick={this.handleCreate}>确定</Button>
+                    {this.state.key==="1" || this.state.key==="2"?(<div style={{textAlign:"center"}}>
+                        <Row className='row-bottom' style={{ marginTop: 50 }}>
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <Button htmlType="submit" onClick={this.handleCreate}>保存</Button>
+                                <Button type="danger" style={{ marginLeft: 8 }} onClick={this.handleReset}>
+                                    <NavLink exact to={{pathname:'/shopList'}}>取消</NavLink>
+                                </Button>
+                            </Col>
+                        </Row>
                     </div>):''}
                 </div>
             </div>
         )
     }   
 }
-export default TabBox;
+export default ShopEdit;

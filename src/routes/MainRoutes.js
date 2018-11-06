@@ -1,5 +1,5 @@
 import React , { Component } from 'react';
-import { Switch,Route,BrowserRouter } from 'react-router-dom';
+import { Switch,Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
 const MyLoadingComponent = ({ isLoading, error }) => {
@@ -14,42 +14,65 @@ const MyLoadingComponent = ({ isLoading, error }) => {
     }
 };
 
-
+ /***            主页             **/
 const Index = Loadable({
-    loader: () => import('../components/layouts/layout'),
+    loader: () => import('../components/index/index'),
     loading: MyLoadingComponent
 });
  /***            门店管理             **/
 //列表
-const Manage = Loadable({
-    loader: () => import('../components/shop/Manage'),
+const ShopList = Loadable({
+    loader: () => import('../components/shop/ShopList'),
     loading: MyLoadingComponent
 });
-const editAddShop = Loadable({
-    loader: () => import('../components/shop/editAddShop'),
+const ShopEdit = Loadable({
+    loader: () => import('../components/shop/ShopEdit'),
     loading: MyLoadingComponent
 });
 
 
 /***            用户管理             **/
 //列表
-const UserControl = Loadable({
-    loader: () => import('../components/user/UserControl'),
+const UserList = Loadable({
+    loader: () => import('../components/user/UserList'),
     loading: MyLoadingComponent
 });
 // 修改
-const WrappedModify = Loadable({
-    loader: () => import('../components/user/Modify'),
+const UserEdit = Loadable({
+    loader: () => import('../components/user/UserEdit'),
+    loading: MyLoadingComponent
+});
+
+/***            法人机构管理             **/
+const OrgList = Loadable({
+    loader: () => import('../components/corporation/OrgList'),
+    loading: MyLoadingComponent
+});
+
+/***            组织机构管理             **/
+const DeptList = Loadable({
+    loader: () => import('../components/department/deptList'),
+    loading: MyLoadingComponent
+});
+/***            区域管理             **/
+const AreaList = Loadable({
+    loader: () => import('../components/area/areaList'),
     loading: MyLoadingComponent
 });
 
 const routes=[
-    // { path :'/',component:Index,exact:true},
-    // { path :'/system',component:Index},
-    { path :'/',component:Manage,exact:true},
-    { path :'/userControl',component:UserControl},
-    { path :'/editAddShop',component:editAddShop},
-    { path :'/modify',component:WrappedModify,}
+    { path :'/',component:Index,exact:true},
+    { path :'/shopList',component:ShopList,exact:true},
+    { path :'/shopEdit/:id?',component:ShopEdit},
+
+    { path :'/userList',component:UserList,exact:true},
+    { path :'/userEdit/:operateType/:id?',component:UserEdit},
+
+    { path :'/orgList',component:OrgList,exact:true},
+
+    { path :'/deptList',component:DeptList,exact:true},
+    { path :'/areaList',component:AreaList,exact:true},
+    { path :'*',component:Index,},
 ];
 
 class MainRoutes extends Component{

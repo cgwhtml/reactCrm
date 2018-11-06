@@ -5,6 +5,12 @@
 .m-right(@param) {
   margin-bottom: @param;
 }
+.height(@param){
+  height:@param
+}
+.width(@param){
+  width:@param
+}
 .icon-asterisk:before{
   display: inline-block;
   margin-right: 4px;
@@ -104,8 +110,32 @@
 /** 滚动条-start **/
 .scrollbar{
   border: 1px solid rgb(217, 217, 217);
-  height: 200px;
-  width: 300px;
   overflow-y: scroll;
+  .height(200px);
+  .width(500px);
 }
 /** 滚动条-end **/
+.deletedContains{
+  .ant-form-item-label{
+        text-align: left;
+  }
+}
+@item_MarginBottom:10px;
+.ant-modal .ant-transfer-list{
+  height: 350px;
+}
+.ant-modal .ant-transfer{
+  margin-left: 33px;
+}
+.ant-row .ant-form-item{
+  margin-bottom: @item_MarginBottom;
+}
+.ant-advanced-search-form .ant-row .ant-form-item{
+  margin-bottom: @item_MarginBottom;
+}
+.ant-modal-body .ant-form .ant-form-item{
+  margin-bottom: @item_MarginBottom;
+}
+.ant-table-body>.ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+  padding: 8px 8px!important;
+}

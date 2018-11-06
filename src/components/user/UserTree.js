@@ -6,10 +6,11 @@ import {ModalBox , MasterBrand, NotMainBrand} from './ModalBox'
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const TreeNode = Tree.TreeNode;
 
 const data={};
 
-class mainBrandArea extends Component{
+class MainBrandArea extends Component{
     constructor(props){
         super(props);
         this.state={
@@ -19,6 +20,13 @@ class mainBrandArea extends Component{
             masterTree:'',//主品牌和区域
             masterData:'',//选中的品牌
         }
+    }
+
+    //主品牌 弹窗
+    handleMasterBox=()=>{
+        console.log('click');
+        this.refs.getMasterButton.showModal();
+        console.log(1);
     }
 
     // 主品牌 获取获取品牌数据
@@ -64,18 +72,21 @@ class mainBrandArea extends Component{
         const _this=this;
     }
 
+    handleClick=()=>{
+        console.log('handleClick');
+    }
+
     render(){
         const _this=this;
         return(
             <div>
-                <Col xxl={{span:24}}>
                     <FormItem label='主品牌' labelCol={{span:2}} wrapperCol={{span:21}} className='required'>
-                        <TextArea placeholder="请选择品牌" value={_this.state.masterName.join('/')} style={{ width: 300,marginRight:15 }} autosize disabled />
+                        <TextArea placeholder="请选择品牌" value={''} style={{ width: 300,marginRight:15 }} autosize disabled />
                         <Button onClick={_this.handleMasterBox}>品牌分配</Button>
-                        <MasterBrand ref="getMasterButton" id={_this.state.id}  filterModalData={this.gainMasterData.bind(this)}></MasterBrand>
+                        <MasterBrand ref="getMasterButton" id={_this.state.id}  filterModalData={_this.gainMasterData.bind(this)}></MasterBrand>
                     </FormItem>
-                </Col>
-                <Col xxl={{span:24}}>
+                
+                {/*<Col xxl={{span:24}}>
                     <FormItem label='主品牌和区域' labelCol={{span:2}} wrapperCol={{span:21}} className='required' >
                         <div className='scrollbar'>
                             {
@@ -107,10 +118,10 @@ class mainBrandArea extends Component{
                         </div>
                         <div style={{color: '#f5222d',display:_this.state.isBrandRequired=='true'?'none':'block'}}>请选择主品牌和区域!</div>
                     </FormItem>
-                </Col>
+                </Col>*/}
             </div>
         )
     }
 }
 
-export { mainBrandArea }
+export { MainBrandArea };

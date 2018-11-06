@@ -1,7 +1,10 @@
-import {Component} from 'react';
+import React,{Component} from 'react';
+import { Modal } from 'antd';
 import axios from 'axios';
 import Qs from 'qs'
+
 import domain from '../../domain/domain'
+import TooltipModal from '../../components/layouts/TooltipModal'
 
 //获取穿梭框左边的name值
 class TransferLeft extends Component{
@@ -11,7 +14,7 @@ class TransferLeft extends Component{
         if(keys){
             keys.map((key)=>{
                 mockData.map((item)=>{
-                    if(key==item.id){
+                    if(key==item.id){//eslint-disable-line
                         if(type==='role'){
                             name.push({isPurchase:item.isPurchase,isArea:item.isArea,isShop:item.isShop,name:item.name,id:item.id});
                         }else{
@@ -47,7 +50,7 @@ class HttpRequest extends  Component{
         })
             .then((res)=>{
                 let data=res.data
-                if(data.error==0){
+                if(data.error===0){
                     let result=data.result;
                     callback(result);
                 }
@@ -73,7 +76,7 @@ class HttpRequest extends  Component{
         })
             .then((res)=>{
                 let data=res.data;
-                if(data.error==0){
+                if(data.error===0){
                     let result=data.result;
                     callback(result);
                 }
@@ -87,7 +90,7 @@ class HttpRequest extends  Component{
         axios.post(domain.uploadImg, param, config)
         .then(res => {
             let data=res.data;
-            if(data.error==0){
+            if(data.error===0){
                 let result=data.result;
                 callback(result);
             }
@@ -106,16 +109,18 @@ class Check extends Component{
             64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
         let tip;
 
-        if(!code || !/^\d{6}(18|19|20)?\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/i.test(code)){
+        if(!rule.required && (value==null || value=="")){//eslint-disable-line
+        	tip=[]; //ok
+        }
+        else if(!code || !/^\d{6}(18|19|20)?\d{2}(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/i.test(code)){
             tip = "身份证号格式错误";
         }
-
         else if(!city[code.substr(0,2)]){
             tip = "身份证地址编码错误";
         }
         else{
             //18位身份证需要验证最后一位校验位
-            if(code.length == 18){
+            if(code.length == 18){//eslint-disable-line
                 code = code.split('');
                 //∑(ai×Wi)(mod 11)
                 //加权因子
@@ -132,7 +137,7 @@ class Check extends Component{
                     sum += ai * wi;
                 }
                 let last = parity[sum % 11];
-                if(parity[sum % 11] != code[17]){
+                if(parity[sum % 11] != code[17]){//eslint-disable-line
                     tip = "身份证校验位错误";
                 }
             }
@@ -141,17 +146,9 @@ class Check extends Component{
     }
 }
 
-//获取url的参数
-class GetQueryString extends Component{
-    static getQueryString(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var r = window.location.search.substr(1).match(reg);
-        if(r != null) return unescape(decodeURI(r[2]));
-        return null;
-    }
-}
 
-export {TransferLeft,HttpRequest,Check,GetQueryString} ;
+
+export {TransferLeft,HttpRequest,Check} ;
 
 
 

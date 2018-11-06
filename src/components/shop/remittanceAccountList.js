@@ -14,10 +14,10 @@ class remittanceAccountList extends Component {
             rows:[],
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'key', width: 100 },
+            { title: '序号', dataIndex: 'key', key: 'key', width: 50 },
             { title: '账户名称', dataIndex: 'name', key: 'name', width: 100 },
-            { title: '开户银行', dataIndex: 'openingBank', key: 'openingBank', width: 100},
-            { title: '银行账号', dataIndex: 'account', key: 'account', width: 150},
+            { title: '开户银行', dataIndex: 'openingBank', key: 'openingBank', width: 150},
+            { title: '银行账号', dataIndex: 'account', key: 'account', width: 200},
             { title: '账号照片', dataIndex: 'url', key: 'url', width: 150,render:(text, record,index)=>(<a href={record.url?record.url:'javascript:'} target='_blank'>查看</a>)},
             { title: '录入日期', dataIndex: 'createdAt', key: 'createdAt', width: 150 },
             { title: '录入人', dataIndex: 'createdName', key: 'createdName', width: 150 },
@@ -50,6 +50,7 @@ class remittanceAccountList extends Component {
             if(item.url){
                 item.url=JSON.parse(item.url)[0].url
             }
+            item.key+=1;
         })
         if(res){
             this.setState({

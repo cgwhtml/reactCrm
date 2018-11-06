@@ -13,7 +13,6 @@ class TooltipModal extends Component{
         this.state = { visible: false }
     }
 
-
     showModal = () => {
         this.setState({
             visible: true,
@@ -21,14 +20,12 @@ class TooltipModal extends Component{
     }
 
     handleOk = (e) => {
-        console.log(e);
         this.setState({
             visible: false,
         });
     }
 
     handleCancel = (e) => {
-        console.log(e);
         this.setState({
             visible: false,
         });

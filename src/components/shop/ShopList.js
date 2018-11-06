@@ -18,7 +18,7 @@ const itemText={
 };
 
 
-class Manage extends Component{
+class ShopList extends Component{
     static propTypes = {
         itemText: PropTypes.object
     }
@@ -33,32 +33,32 @@ class Manage extends Component{
             pageCur: 1
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'id', fixed: 'left', width: 100 },
-            { title: '门店编号', dataIndex: 'id', key: 'shopId', width: 100},
-            { title: '门店名称', dataIndex: 'name', key: 'name', width: 150 },
-            { title: '门店地址', dataIndex: 'address', key: 'address', width: 200 },
-            { title: '公司名称', dataIndex: 'company', key: 'company', width: 300 },
-            { title: '老板', dataIndex: 'principal', key: 'principal', width: 150 },
+            { title: '序号', dataIndex: 'key', key: 'id', fixed: 'left', width: 70 },
+            { title: '门店编号', dataIndex: 'id', key: 'shopId', width: 200},
+            { title: '门店名称', dataIndex: 'name', key: 'name', width: 300 },
+            { title: '门店地址', dataIndex: 'address', key: 'address', width: 300 },
+            { title: '公司名称', dataIndex: 'company', key: 'company', width: 400 },
+            { title: '老板', dataIndex: 'boss', key: 'boss', width: 150 },
             { title: '管理员', dataIndex: 'manager', key: 'manager', width: 150 },
-            { title: '营业情况', dataIndex: 'businessCondition', key: 'businessCondition', width: 150 },
-            { title: '分销级别', dataIndex: 'distributionLevel', key: 'distributionLevel', width: 150 },
-            { title: '门店类别', dataIndex: 'type', key: 'type' , width: 150},
-            { title: '加盟方式', dataIndex: 'joinType', key: 'joinType', width: 150 },
-            { title: '等级', dataIndex: 'level', key: 'level', width: 150 },
-            { title: '加盟区域', dataIndex: 'joinShopRegion', key: 'joinShopRegion' , width: 200},
-            { title: '区域经理', dataIndex: 'areaManager', key: 'areaManager' , width: 150},
-            { title: '入网日期', dataIndex: 'joinDate', key: 'joinDate' , width: 150},
-            { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName' , width: 150},
+            { title: '营业情况', dataIndex: 'status', key: 'status', width: 200 },
+            { title: '分销级别', dataIndex: 'distributionLevel', key: 'distributionLevel', width: 200 },
+            { title: '门店类别', dataIndex: 'type', key: 'type' , width: 200},
+            { title: '加盟方式', dataIndex: 'joinType', key: 'joinType', width: 200 },
+            { title: '等级', dataIndex: 'level', key: 'level', width: 100 },
+            { title: '加盟区域', dataIndex: 'joinShopRegion', key: 'joinShopRegion' , width: 400},
+            { title: '区域经理', dataIndex: 'areaManager', key: 'areaManager' , width: 200},
+            { title: '招商经理', dataIndex: 'bdManagerName', key: 'bdManagerName' , width: 200},
+            { title: '入网日期', dataIndex: 'joinDate', key: 'joinDate' , width: 200},
+            { title: '删除', dataIndex: 'isDeleteName', key: 'isDeleteName' , width: 120},
             {
                 title: '操作',
                 key: 'operation',
                 fixed: 'right',
-                width: 200,
+                width: 180,
                 render: (text, record,index) =>(<div>
                     <Button>
-                        <NavLink exact to={{pathname:'/editAddShop',state:{id:record.id}}}>修改</NavLink>
+                        <NavLink  to={`/shopEdit/${record.id}`}>修改</NavLink>
                     </Button>
-                    {/*<Button onClick={() =>this.handleRevampClick(text, record,index)}>修改</Button>*/}
                     {record.isDelete==0 ?
                         (
                             <Button type="danger" style={{display:'inline-block',marginLeft:'10px'}}>
@@ -77,10 +77,6 @@ class Manage extends Component{
                 </div>) ,
             },
         ];
-    }
-    //表格
-    handleRevampClick=(text, record, index)=>{
-        this.props.history.push(`/system/editAddShop?id=${record.id}`)
     }
      // 初始化列表数据函数
      initData=(current,pageSize,searchValues)=>{
@@ -133,6 +129,11 @@ class Manage extends Component{
     componentDidMount=()=>{
         this.initData();
     }
+    componentWillUnmount = () => {
+        this.setState = (state,callback)=>{
+          return;
+        };
+    }
     handleData=(res,pageSize)=>{
         if(res.data){
             res.data.map(item=>{
@@ -140,7 +141,7 @@ class Manage extends Component{
                     return items.region    
                 }).join(",")
                 item.key+=1;
-                item.isDeleteName=item.isDelete==0?'未删除':'已删除'
+                item.isDeleteName=item.isDelete==0?'':'已删除'
             })
             this.setState({
                 rows: res
@@ -169,7 +170,7 @@ class Manage extends Component{
                     <Table
                         columns={this.columns}
                         dataSource={data}
-                        scroll={{ x: 2350}}
+                        scroll={{ x: 1800}}
                         pagination={pagination}
                     />
                 </div>
@@ -177,4 +178,4 @@ class Manage extends Component{
         )
     }
 }
-export default Manage;
+export default ShopList;

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {BrowserRouter} from 'react-router-dom';
-import SiderDemo from './components/layouts/layout';
-
+import AppLayout from './components/layouts/layout';
 
 
 // 添加请求拦截器
@@ -34,9 +32,7 @@ axios.interceptors.response.use(function (response) {
 class App extends Component {
   render() {
     return (
-      <BrowserRouter>
-          <SiderDemo/>
-      </BrowserRouter>
+        <AppLayout/>
     );
   }
 }
