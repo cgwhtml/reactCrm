@@ -1,10 +1,20 @@
 import React , { Component } from 'react';
-import { Switch,Route } from 'react-router-dom';
+import { Switch,Route} from 'react-router-dom';
+import { Spin } from 'antd';
 import Loadable from 'react-loadable';
 
 const MyLoadingComponent = ({ isLoading, error }) => {
+    const style={
+        "textAlign": "center",
+        "lineHeight":"800px",
+        "width":"100%",
+        "height":"800px",
+        "background":" #fff",
+        "marginBottom": "20px",
+        "margin":" 20px 0"
+    }
     if (isLoading) {
-        return <div>Loading...</div>
+        return  <div style={style}><Spin /></div>
     }
     else if (error) {
         return <div>Sorry, there was a problem loading the page.</div>
@@ -54,9 +64,22 @@ const DeptList = Loadable({
     loader: () => import('../components/department/deptList'),
     loading: MyLoadingComponent
 });
+
 /***            区域管理             **/
 const AreaList = Loadable({
     loader: () => import('../components/area/areaList'),
+    loading: MyLoadingComponent
+});
+
+/***            角色管理             **/
+const RoleList = Loadable({
+    loader: () => import('../components/role/roleList'),
+    loading: MyLoadingComponent
+});
+
+/***            系统配置             **/
+const SysConfig = Loadable({
+    loader: () => import('../components/SysConfig/SysConfig'),
     loading: MyLoadingComponent
 });
 
@@ -71,7 +94,13 @@ const routes=[
     { path :'/orgList',component:OrgList,exact:true},
 
     { path :'/deptList',component:DeptList,exact:true},
+    
     { path :'/areaList',component:AreaList,exact:true},
+
+    { path :'/roleList',component:RoleList,exact:true},
+
+    { path :'/sysConfig',component:SysConfig,exact:true},
+    
     { path :'*',component:Index,},
 ];
 

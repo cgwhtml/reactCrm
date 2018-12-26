@@ -96,6 +96,7 @@ class deptManage extends Component{
                             content: `操作成功！`,
                             onOk:()=>{
                                 _this.handleSubmit();
+                                _this.handleAreaTreeSelect([id]);
                                 HttpRequest.getRequest(
                                     {
                                         url: domain.deptDetail,
@@ -145,6 +146,9 @@ class deptManage extends Component{
                         content: `保存成功！`,
                         onOk:()=>{
                             _this.setState({ visible: false });
+                            if(this.state.id){
+                                _this.handleAreaTreeSelect([this.state.id])
+                            }
                             _this.handleSubmit();
                         }
                     });
@@ -196,7 +200,7 @@ class deptManage extends Component{
                     <Row gutter={24}>
                         <Col span={7}>
                             <Collapse defaultActiveKey={['1']} style={{width:450}}>
-                                <Panel showArrow={false} header="组织机构树" key="1">
+                                <Panel showArrow={false} header="组织机构树" key="1" disabled>
                                     <TowableTree handleAreaTreeSelect={this.handleAreaTreeSelect} searchDelete={this.state.searchDelete} onRef={this.onRef} gdata={gdata}
                                     urlTree={urlTree} urlDrag={urlDrag}/>
                                 </Panel>
@@ -205,15 +209,15 @@ class deptManage extends Component{
                         
                         <Col span={13}>
                             <Collapse defaultActiveKey={['1']} style={{width:450}}>
-                                <Panel showArrow={false} header="组织机构信息" key="1">
-                                    <p>机构名称：{deptMsg.name?deptMsg.name:''}</p>
+                                <Panel showArrow={false} header="组织机构信息" key="1" disabled>
                                     <p>机构编码：{deptMsg.id?deptMsg.id:''}</p>
+                                    <p>机构名称：{deptMsg.name?deptMsg.name:''}</p>                         
                                     <p>机构全称：{deptMsg.fullName?deptMsg.fullName:''}</p>
+                                    <p>机构主管：{deptMsg.manager?deptMsg.manager:''}</p>
                                     <p>上级部门ID：{deptMsg.parentId?deptMsg.parentId:''}</p>
                                     <p>上级部门名称：{deptMsg.parentIds?deptMsg.parentIds:''}</p>
                                     <p>全部上级部门ID：{deptMsg.parentIds?deptMsg.parentIds:''}</p>
-                                    <p>机构主管：{deptMsg.manager?deptMsg.manager:''}</p>
-                                    <p>已删除：{deptMsg.isDelete==="0"?'未删除':(deptMsg.isDelete==="1"?'已删除':'')}</p>
+                                    <p>数据状态：{deptMsg.isDelete==="0"?'未删除':(deptMsg.isDelete==="1"?'已删除':'')}</p>
                                     <p>创建时间：{deptMsg.createdAt?deptMsg.createdAt:''}</p>
                                     <p>创建人：{deptMsg.createdName?deptMsg.createdName:''}</p>
                                     <p>更新时间：{deptMsg.updatedAt?deptMsg.updatedAt:''}</p>

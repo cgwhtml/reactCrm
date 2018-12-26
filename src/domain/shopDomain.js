@@ -14,6 +14,8 @@
 
     shopUserList:title+'/system/user/inShop', //查询门店用户
 
+    shopUserInShop:title+'/system/user/inShopWithBoss', //查询该门店所有用户
+
     shopMangerList:title+'/system/user/name/like', //查询区域经理
     
     addShop:title+'/system/shop/addOrUpdate', //新增门店

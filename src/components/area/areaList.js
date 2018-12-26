@@ -32,7 +32,8 @@ class areaManage extends Component{
             searchDelete:0,
             gdata:{id:1000},
             urlTree:domain.tree,
-            urlDrag:domain.dragArea
+            urlDrag:domain.dragArea,
+            areaRegionList:''
         }
     }
     onRef = (ref) => {
@@ -69,12 +70,28 @@ class areaManage extends Component{
                     })
                 }
             )
+            HttpRequest.getRequest(
+                {
+                    url: domain.areaRegionList,
+                    params:{areaId:this.state.id},
+                },
+                res=>{
+                    let str='';
+                    res.map((item)=>{
+                        str+=item.name+' ';
+                        return str;
+                    })
+                    this.setState({
+                        areaRegionList:str
+                    })
+                }
+            )
         })
     }
     // 删除或者恢复某节点
     deleteNode=(id,isDelete)=>{
         const _this=this;
-        const content=isDelete==0?'是否确定将该区域删除？':'是否确定将该区域恢复？'
+        const content=isDelete==="0"?'是否确定将该区域删除？':'是否确定将该区域恢复？'
         if(!id){
             Modal.error({
                 title: '警告',
@@ -96,6 +113,7 @@ class areaManage extends Component{
                             content: `操作成功！`,
                             onOk:()=>{
                                 _this.handleSubmit();
+                                _this.handleAreaTreeSelect([id]);
                                 HttpRequest.getRequest(
                                     {
                                         url: domain.areaDetail,
@@ -135,9 +153,10 @@ class areaManage extends Component{
             }
             values.addLocation=this.state.childNode===0?0:1;
             values.clickedId=this.state.clickedId;
+            values.level=this.state.childNode===0?2:1;
             HttpRequest.postRequest({
                 url:domain.areaEdit,
-                data:values
+                data:values,
                 },
                 result=>{
                     Modal.success({
@@ -145,6 +164,9 @@ class areaManage extends Component{
                         content: `操作成功！`,
                         onOk:()=>{
                             _this.setState({ visible: false });
+                            if(this.state.id){
+                                _this.handleAreaTreeSelect([this.state.id])
+                            }
                             _this.handleSubmit();
                         }
                     });
@@ -155,7 +177,7 @@ class areaManage extends Component{
     render(){
         const _this=this;
         const { getFieldDecorator } = _this.props.form;
-        const {areaMsg,id,gdata,urlTree,urlDrag,clickedId}=this.state;
+        const {areaMsg,id,gdata,urlTree,urlDrag,clickedId,areaRegionList}=this.state;
         let button;
         if(areaMsg.isDelete==="1")
         {
@@ -196,7 +218,7 @@ class areaManage extends Component{
                     <Row gutter={24}>
                         <Col span={7}>
                             <Collapse defaultActiveKey={['1']} style={{width:450}}>
-                                <Panel showArrow={false} header="区域树" key="1">
+                                <Panel showArrow={false} header="区域树" key="1" disabled>
                                     <TowableTree handleAreaTreeSelect={this.handleAreaTreeSelect} searchDelete={this.state.searchDelete} onRef={this.onRef} gdata={gdata}
                                     urlTree={urlTree} urlDrag={urlDrag}/>
                                 </Panel>
@@ -205,21 +227,22 @@ class areaManage extends Component{
                         
                         <Col span={13}>
                             <Collapse defaultActiveKey={['1']} style={{width:450}}>
-                                <Panel showArrow={false} header="区域信息" key="1">
-                                    <p>区域名称：{areaMsg.name?areaMsg.name:''}</p>
+                                <Panel showArrow={false} header="区域信息" key="1" disabled>
                                     <p>区域编码：{areaMsg.id?areaMsg.id:''}</p>
+                                    <p>区域名称：{areaMsg.name?areaMsg.name:''}</p>
                                     <p>区域全称：{areaMsg.fullname?areaMsg.fullname:''}</p>
-                                    <p>区域级别：{areaMsg.level?areaMsg.level:''}</p>
+                                    <p>区域级别：{areaMsg.level==="1"?'大区':'区域'}</p>
                                     <p>全部上级区域ID：{areaMsg.parentIds?areaMsg.parentIds:''}</p>
-                                    <p>已删除：{areaMsg.isDelete==="0"?'未删除':(areaMsg.isDelete==="1"?'已删除':'')}</p>
+                                    <p>数据状态：{areaMsg.isDelete==="0"?'未删除':(areaMsg.isDelete==="1"?'已删除':'')}</p>
                                     <p>创建时间：{areaMsg.createdAt?areaMsg.createdAt:''}</p>
                                     <p>创建人：{areaMsg.createdName?areaMsg.createdName:''}</p>
                                     <p>更新时间：{areaMsg.updatedAt?areaMsg.updatedAt:''}</p>
                                     <p>更新人：{areaMsg.updatedName?areaMsg.updatedName:''}</p>
                                 </Panel>
                             </Collapse>
-                            <Collapse style={{width:450,marginTop:20}}>
-                                <Panel showArrow={false} header="包含行政区划" key="1">
+                            <Collapse defaultActiveKey={['1']} style={{width:450,marginTop:20}}>
+                                <Panel showArrow={false} header="包含行政区划" key="1" disabled>
+                                    <p>{areaRegionList}</p>
                                 </Panel>
                             </Collapse>
                         </Col>

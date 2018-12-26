@@ -10,7 +10,7 @@ class AreaModalBox extends React.Component {
             mockData:[],
             visible: false,
             targetKeys:[],
-            titles:['未分配行政区划', '已分配行政区划'],
+            titles:['未分配', '已分配'],
             provinceList:[],
             level:1
         };
@@ -27,15 +27,22 @@ class AreaModalBox extends React.Component {
             } 
         },
         res=>{
-            res.map((item)=>{
-                item.key=item.id;
-            })
-            this.setState({
-                provinceList:res,
-                mockData:res,
-            })
+            if(res.length>0){
+                res.map((item)=>{
+                    item.key=item.id;
+                    item.level=1;
+                    return item;
+                })
+                this.setState({
+                    provinceList:res,
+                    mockData:res,
+                })    
+            }
         }
-    )  
+    )
+    setTimeout(()=>{
+        this.changeLevel(1)
+    },500)
   }
     //传值
     filterList=()=>{
@@ -63,24 +70,45 @@ class AreaModalBox extends React.Component {
     }
     // 区域等级改变
     changeLevel(e){
+        let areaArrlist=this.props.areaArr;
+        let arrListP=[];
+        let arrListC=[];
+        let selectedListP=[];
+        let selectedListC=[];
+        if(areaArrlist.length>0){
+            areaArrlist.map((item)=>{
+                item.key=item.id;
+                item.title=item.name;
+                if(item.level===1){
+                    selectedListP.push(item.id);
+                    arrListP.push(item);
+                }else{
+                    selectedListC.push(item.id);
+                    arrListC.push(item);
+                }
+                return item;
+            })
+        }
         if(e===2){
             this.setState({
-                mockData:[]
+                targetKeys:selectedListC,
+                mockData:[...arrListC]
             })
         }else{
             this.setState({
-                mockData:this.state.provinceList
+                targetKeys:selectedListP,
+                mockData:[...arrListP,...this.state.provinceList]
             })
         }
         this.setState({
             level:e,
-            targetKeys:[]
+            // targetKeys:[]
         })
     }
     changeProvince(e){
         HttpRequest.getRequest(
             {
-                url:domain.areaList,
+                url:domain.areaRegion,
                 params:{
                     regionId:e,
                     level:2
@@ -89,6 +117,8 @@ class AreaModalBox extends React.Component {
             res=>{
                 res.map((item)=>{
                     item.key=item.id;
+                    item.level=2;
+                    return item;
                 })
                 this.setState({
                     mockData:res,
@@ -98,18 +128,16 @@ class AreaModalBox extends React.Component {
     }
 
   handleChange = (targetKeys, direction, moveKeys) => {
-    console.log(targetKeys);
     this.setState({ targetKeys:targetKeys});
   }
 
   render() {
-    const {provinceList,level,mockData,visible}=this.state;
+    const {provinceList,level,mockData,visible,targetKeys}=this.state;
     return (
         <Modal
             title="操作"
             visible={visible}
             destroyOnClose={true}
-            title={"行政区划分"}
             okText="保存"
             onCancel={this.handleCancel}
             onOk={()=>this.handleModalOk()}
@@ -120,7 +148,7 @@ class AreaModalBox extends React.Component {
                 <Select.Option key={1} value={1}>省级</Select.Option>
                 <Select.Option key={2} value={2}>市级</Select.Option>
             </Select>
-            {level===2?(<Select placeholder='请选择省'allowClear  onChange={this.changeProvince.bind(this)} style={{width: 200,marginLeft:"20px"}}>
+            {level===2?(<Select placeholder='请选择省' allowClear  onChange={this.changeProvince.bind(this)} style={{width: 200,marginLeft:"20px"}}>
                 {provinceList.length > 0 &&
                     provinceList.map((item, i) => {
                         return (
@@ -133,9 +161,10 @@ class AreaModalBox extends React.Component {
             </Select>):''}        
             </Row>
             <Transfer
+                titles={this.state.titles}
                 dataSource={mockData}
-                targetKeys={this.state.targetKeys}
                 onChange={this.handleChange}
+                targetKeys={targetKeys}
                 render={item => item.name}
             />
         </Modal>

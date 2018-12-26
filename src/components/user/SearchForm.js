@@ -16,6 +16,7 @@ class SearchForm extends React.Component {
   constructor(props){
     super(props);
     this.state={
+      dealy:500,
       expand: false,
       initialValue: 1,
       values: undefined,
@@ -70,19 +71,22 @@ class SearchForm extends React.Component {
   }
   // 门店模糊查询
   handleShopSearch(e){
-    HttpRequest.getRequest(
-      {
-          url:domain.shopSearchList,
-          params:{
-            keyWord:e,
-          },
-      },
-      res=>{
-        this.setState({
-          shopDataSources:res?res:[]
-        })
-      }
-    )
+    clearTimeout(this.timer);
+    this.timer = setTimeout(()=>{
+      HttpRequest.getRequest(
+        {
+            url:domain.shopSearchList,
+            params:{
+              keyWord:e,
+            },
+        },
+        res=>{
+          this.setState({
+            shopDataSources:res?res:[]
+          })
+        }
+      )
+    },this.state.dealy);
   }
 
   render() {
@@ -97,28 +101,28 @@ class SearchForm extends React.Component {
         onSubmit={this.handleSearch}
       >
         <Row gutter={24}>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="登录账号" {...formItemLayout}>
               {getFieldDecorator(`loginId`)(
                 <Input placeholder="请输入登录账号" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="姓名" {...formItemLayout}>
               {getFieldDecorator(`fullname`)(
                 <Input placeholder="请输入姓名" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="ID" {...formItemLayout}>
               {getFieldDecorator(`id`)(
                 <Input placeholder="请输入id" style={{ width: 200 }}/>  
               )}
             </FormItem>
           </Col>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="所属部门" {...formItemLayout}>
               {getFieldDecorator(`departmentId`)(
                  <TreeSelect
@@ -150,7 +154,7 @@ class SearchForm extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="所属门店" {...formItemLayout}>
               {getFieldDecorator(`shopName`)(
                 <Select
@@ -177,7 +181,7 @@ class SearchForm extends React.Component {
               )}
             </FormItem>
           </Col>
-          <Col span={8} style={{ textAlign: 'left'}}>
+          <Col span={8}>
             <FormItem label="角色" {...formItemLayout}>
               {getFieldDecorator(`roleId`)(
                   <Select

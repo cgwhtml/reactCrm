@@ -3,7 +3,7 @@ import React , {Component} from 'react';
 import PropTypes from 'prop-types';
 import { Table,Button,Popconfirm } from 'antd';
 import { NavLink } from 'react-router-dom';
-import {HttpRequest} from '../../utils/js/common'
+import {HttpRequest,CountDown} from '../../utils/js/common'
 import domain from '../../domain/domain';
 
 import BreadcrumbItems from '../layouts/BreadcrumbItems';
@@ -33,8 +33,8 @@ class ShopList extends Component{
             pageCur: 1
         };
         this.columns=[
-            { title: '序号', dataIndex: 'key', key: 'id', fixed: 'left', width: 70 },
-            { title: '门店编号', dataIndex: 'id', key: 'shopId', width: 200},
+            { title: '序号', dataIndex: 'key', key: 'key', fixed: 'left', width: 70 },
+            { title: '门店编号', dataIndex: 'id', key: 'id', width: 200},
             { title: '门店名称', dataIndex: 'name', key: 'name', width: 300 },
             { title: '门店地址', dataIndex: 'address', key: 'address', width: 300 },
             { title: '公司名称', dataIndex: 'company', key: 'company', width: 400 },
@@ -105,7 +105,8 @@ class ShopList extends Component{
             }
             },
             result=>{
-                this.initData()
+                CountDown.countDown("操作成功");
+                this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues);
             })
     }
     // 搜索
@@ -127,21 +128,22 @@ class ShopList extends Component{
         this.initData(current,pageSize,this.state.searchValues);
     } 
     componentDidMount=()=>{
-        this.initData();
+        this.handleFilter();
     }
     componentWillUnmount = () => {
         this.setState = (state,callback)=>{
           return;
         };
     }
-    handleData=(res,pageSize)=>{
+    handleData=(res)=>{
         if(res.data){
             res.data.map(item=>{
                 item.joinShopRegion=item.joinShopRegion.map(items=>{
                     return items.region    
                 }).join(",")
                 item.key+=1;
-                item.isDeleteName=item.isDelete==0?'':'已删除'
+                item.isDeleteName=item.isDelete==="0"?'':'已删除';
+                return item;
             })
             this.setState({
                 rows: res
@@ -170,7 +172,7 @@ class ShopList extends Component{
                     <Table
                         columns={this.columns}
                         dataSource={data}
-                        scroll={{ x: 1800}}
+                        scroll={{ x: 3000}}
                         pagination={pagination}
                     />
                 </div>

@@ -4,7 +4,7 @@ import WrappedSearchForm from './SearchForm'
 import PropTypes from 'prop-types';
 import { Table,Button,Popconfirm} from 'antd';
 import { NavLink } from 'react-router-dom';
-import {HttpRequest} from '../../utils/js/common';
+import {HttpRequest,CountDown} from '../../utils/js/common';
 import domain from '../../domain/domain';
 //用户管理
 const itemText = {
@@ -108,11 +108,12 @@ class UserList extends Component {
             url:domain.userDelete,
             data:{
                 id:parseInt(record.id),
-                deleteCode:record.isDelete==0?1:0    
+                deleteCode:record.isDelete==="0"?1:0    
             }
             },
             result=>{
-                this.initData()
+                CountDown.countDown("操作成功");
+                this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues);
             })
     }
      // 锁定以及解锁
@@ -121,11 +122,12 @@ class UserList extends Component {
             url:domain.userLock,
             data:{
                 id:parseInt(record.id),
-                lockedCode:record.isLocked==0?1:0    
+                lockedCode:record.isLocked==="0"?1:0    
             }
             },
             result=>{
-                this.initData();
+                CountDown.countDown("操作成功");
+                this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues);
             })
     }
     // 搜索
@@ -133,7 +135,7 @@ class UserList extends Component {
         this.setState({
             searchValues:values
         },()=>{
-            this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues)
+            this.initData(this.state.pageCur,this.state.pageSize,this.state.searchValues);
         })  
     }
     //分页
@@ -162,8 +164,9 @@ class UserList extends Component {
                     return items.shopName    
                 }).join(" , ")
                 item.key+=1;
-                item.isDeleteName=item.isDelete==0?'':'已删除';
-                item.isLockedName=item.isLocked==0?'':'已锁定';
+                item.isDeleteName=item.isDelete==="0"?'':'已删除';
+                item.isLockedName=item.isLocked==="0"?'':'已锁定';
+                return item;
             })
             this.setState({
                 rows: res

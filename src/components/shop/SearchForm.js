@@ -14,6 +14,7 @@ class SearchForm extends Component{
     constructor(props){
         super(props);
         this.state={
+            dealy:500,
             expand: false,
             provinceList:[],
             cityList:[],
@@ -141,51 +142,59 @@ class SearchForm extends Component{
     }
     // 公司名称模糊匹配
     searchCompany(e){
-        HttpRequest.getRequest(
-        {
-            url:domain.companyList,
-            params:{
-                keyWord:e
-            } 
-        },
-        res=>{
-            this.setState({
-                companyList:res
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
+            {
+                url:domain.companyList,
+                params:{
+                    keyWord:e
+                }
+            },
+            res=>{
+                this.setState({
+                    companyList:res
+                })
             })
-        }
-        )
+        },this.state.dealy);
     }
     // 查询区域经理
     searchManage(e){
-        HttpRequest.getRequest(
-        {
-            url:domain.shopMangerList,
-            params:{
-            keyWord:e,
-            roleType:1
-            } 
-        },
-        res=>{
-            this.setState({
-            manageList:res
-            })
-        })
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:1
+                    }
+                },
+                res=>{
+                    this.setState({
+                        manageList:res
+                    })
+                })
+        },this.state.dealy);
     }
     // 查询对接人
     searchPickPerson(e){
-        HttpRequest.getRequest(
-        {
-            url:domain.shopMangerList,
-            params:{
-            keyWord:e,
-            roleType:2
-            } 
-        },
-        res=>{
-            this.setState({
-                pickList:res
-            })
-        })
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:2
+                    }
+                },
+                res=>{
+                    this.setState({
+                        pickList:res
+                    })
+                })
+        },this.state.dealy);
     }
     render(){
         const { getFieldDecorator } = this.props.form;

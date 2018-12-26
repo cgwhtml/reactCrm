@@ -20,7 +20,6 @@ class TransferLeft extends Component{
                         }else{
                             name.push({name:item.name,id:item.id});
                         }
-
                     }
                 });
             });
@@ -97,7 +96,19 @@ class HttpRequest extends  Component{
         })
     }
 }
-
+// 1.5秒弹框
+class CountDown extends Component{
+    static countDown(content) {
+        let secondsToGo = 1.5;
+        const modal = Modal.success({
+          title: '确定',
+          content: content,
+        });
+        setTimeout(() => {
+          modal.destroy();
+        }, secondsToGo * 1000);
+    }
+}
 //校验
 class Check extends Component{
     static  idCard(rule, value, callback){
@@ -148,7 +159,7 @@ class Check extends Component{
 
 
 
-export {TransferLeft,HttpRequest,Check} ;
+export {TransferLeft,HttpRequest,Check,CountDown} ;
 
 
 

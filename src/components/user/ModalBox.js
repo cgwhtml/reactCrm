@@ -1,7 +1,6 @@
 //wq 角色分配 品牌分配
 import React , {Component} from 'react';
 import { Modal, Button,Transfer } from 'antd';
-import axios from 'axios';
 
 
 import domain from '../../domain/domain';
@@ -53,28 +52,16 @@ class ModalBox extends Component{
     //穿梭框
     handleChange = (nextTargetKeys, direction, moveKeys) => {
         this.setState({ targetKeys: nextTargetKeys });
-
-        // console.log('targetKeys: ', nextTargetKeys);
-        // console.log('direction: ', direction);
-        // console.log('moveKeys: ', moveKeys);
     }
 
     handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
         this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
-
-        // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-        // console.log('targetSelectedKeys: ', targetSelectedKeys);
     }
 
     handleScroll = (direction, e) => {
-        // console.log('direction:', direction);
-        // console.log('target:', e.target);
+
     }
-    // componentWillReceiveProps=(nextProps)=>{
-    //     this.setState({
-    //         targetKeys:nextProps.mockData.targetKeys
-    //     });
-    // }
+
     componentDidMount = ()=>{
         var _this=this;
         HttpRequest.getRequest({
@@ -145,7 +132,6 @@ class MasterBrand extends Component{
         filterModalData(name);
     }
     handleModalOk = (e) => {
-        console.log(e.target);
         let _this=this;
         _this.filterList();
         _this.setState({
@@ -187,7 +173,9 @@ class MasterBrand extends Component{
 
         })
     }
-
+    componentDidMount = ()=>{
+        this.brand();
+    }
     render(){
         return(
             <div>
@@ -260,27 +248,16 @@ class NotMainBrand extends Component{
     //穿梭框
     handleChange = (nextTargetKeys, direction, moveKeys) => {
         this.setState({ targetKeys: nextTargetKeys });
-        // console.log('targetKeys: ', nextTargetKeys);
-        // console.log('direction: ', direction);
-        // console.log('moveKeys: ', moveKeys);
     }
 
     handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
         this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
-
-        // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-        // console.log('targetSelectedKeys: ', targetSelectedKeys);
     }
 
     handleScroll = (direction, e) => {
-        // console.log('direction:', direction);
-        // console.log('target:', e.target);
+
     }
-    // componentWillReceiveProps=(nextProps)=>{
-    //     this.setState({
-    //         targetKeys:nextProps.mockData.targetKeys
-    //     });
-    // }
+
     brand = ()=>{
         var _this=this;
         HttpRequest.getRequest({
@@ -299,8 +276,7 @@ class NotMainBrand extends Component{
         })
     }
     componentDidMount = ()=>{
-
-
+        this.brand();
     }
     render(){
         return(

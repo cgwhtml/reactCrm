@@ -5,6 +5,7 @@ import userDomain from './userDomain';
 import shopDomain from './shopDomain';
 import areaDomain from './areaDomain';
 import deptDomain from './deptDomain';
+import roleDomain from './roleDomain';
 const title='';
 const commonObj={
     // 公用接口
@@ -13,6 +14,8 @@ const commonObj={
     shopTypeList:title+'/system/code/accurate', //字典表接口
     shopName:title+'/system/shop/name/like',//4.71.查询门店名字包含关
 }
-const domain=Object.assign(commonObj,orgDomain,userDomain,shopDomain,areaDomain,deptDomain)
+const domain=Object.assign({},commonObj,orgDomain,userDomain,shopDomain,areaDomain,deptDomain)
 
 export default domain;
+
+export {roleDomain};

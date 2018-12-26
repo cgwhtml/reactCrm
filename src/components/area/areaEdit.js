@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{Component} from 'react';
 import { Button, Modal, Form, Input,Select} from 'antd';
 import AreaModalBox from './AreaModalBox';
 import {HttpRequest} from '../../utils/js/common';
@@ -6,7 +6,7 @@ import domain from '../../domain/domain';
 
 const FormItem = Form.Item;
 
-class areaEdit extends React.Component {
+class areaEdit extends Component {
     constructor(props){
         super(props);
         this.state={
@@ -14,7 +14,8 @@ class areaEdit extends React.Component {
             id:'',
             orgCodeType:[],
             areaCodeArr:[],
-            areaArr:[]
+            areaArr:[],
+            levelChangeArr:[]
         };
     }
     onRef = (ref) => {
@@ -24,12 +25,20 @@ class areaEdit extends React.Component {
         this.areaModal.showModal();
     }
     getAreaData=(value)=>{
+        let originArr=this.state.levelChangeArr;
+        let arr=originArr.length>0?originArr:[];
         value.map((item)=>{
-            this.state.areaCodeArr.push(item.id)
-            return this.state.areaCodeArr;
+            originArr.push(item.id);
+            return originArr;
         })
+        value.map((item)=>{
+            arr.push(item.id)
+            return arr;
+        })
+        let uniqueArr=[...new Set(arr)];
         this.setState({
-            areaCodeArr:this.state.areaCodeArr,
+            levelChangeArr:uniqueArr,
+            areaCodeArr:uniqueArr,
             areaArr:value
         })
     }
@@ -38,6 +47,23 @@ class areaEdit extends React.Component {
         if(!id){
             return;
         }
+        HttpRequest.getRequest(
+            {
+                url: domain.areaRegionList,
+                params:{areaId:id},
+            },
+            res=>{
+                let arr=[];
+                res.map((item)=>{
+                    arr.push(item.id)
+                    return arr;
+                })
+                this.setState({
+                    areaCodeArr:arr,
+                    areaArr:res
+                })
+            }
+        )
         HttpRequest.getRequest(
             {
                 url:domain.areaDetail,
@@ -102,15 +128,14 @@ class areaEdit extends React.Component {
                     {getFieldDecorator(`area`,{
                             initialValue:areaCodeArr,
                             rules:[{
-                            required:true,
-                            message: '请选择行政区划!'
+                            required:false,
                         }]
                     })(
                         <Select
                             mode="multiple"
                             style={{ width: 200}}
                             placeholder='请选择行政区划'
-                            disabled
+                           
                         >
                             {areaArr.length>0 &&
                                 areaArr.map((item,i) => {
@@ -126,10 +151,11 @@ class areaEdit extends React.Component {
                     )}
                     <Button onClick={()=>this.showAreaModal()} style={{marginLeft:"20px"}}>行政区划</Button>
                     <AreaModalBox
+                        areaArr={areaArr.length>0?areaArr:''} 
                         onRef={this.onRef} 
-                        filterModalData={this.getAreaData.bind(this)}    
-                       />
-                </FormItem>        
+                        filterModalData={this.getAreaData.bind(this)}   
+                    />
+                </FormItem>      
             </Form>
         </Modal>
     );

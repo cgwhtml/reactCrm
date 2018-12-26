@@ -7,10 +7,11 @@ import domain from '../../domain/domain';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class RegistrationForm extends React.Component {
+class RegistrationForm extends Component {
     constructor(props){
         super(props);
         this.state={
+            dealy:500,
             isRequired:false,
             editRequired:false,
             provinceList:[],
@@ -117,7 +118,7 @@ class RegistrationForm extends React.Component {
             // 门店人员查询
             HttpRequest.getRequest(
                 {
-                    url:domain.shopUserList,
+                    url:domain.shopUserInShop,
                     params:{
                         shopId:id
                     }
@@ -151,16 +152,16 @@ class RegistrationForm extends React.Component {
                             this.changeCity2(res.joinProvinceRegion?res.joinCityRegion.regionId:res.cityCode,1);
                         }
                         if(res.orgName){
-                            this.searchCompany(res.orgName);
+                            this.searchCompany(res.orgName,1);
                             this.setState({
                                 orgObj:{orgCode:res.orgCode?res.orgCode:'',orgPrincipalName:res.orgPrincipalName?res.orgPrincipalName:'',orgPrincipalPhone:res.orgPrincipalPhone?res.orgPrincipalPhone:''}
                             })
                         }
                         if(res.areaManagerName){
-                            this.searchManage(res.areaManagerName)
+                            this.searchManage(res.areaManagerName,1)
                         }
                         if(res.bdManagerName){
-                            this.searchPickPerson(res.bdManagerName)
+                            this.searchPickPerson(res.bdManagerName,1)
                         }
                         this.onChangeBoss(res.bossId)
                         this.onChangeManageer(res.managerId)
@@ -259,8 +260,24 @@ class RegistrationForm extends React.Component {
         }
     }
     // 公司名称模糊匹配
-    searchCompany(e){
-        HttpRequest.getRequest(
+    searchCompany(e,immediate){
+        if(immediate){
+            HttpRequest.getRequest(
+                {
+                    url:domain.companyList,
+                    params:{
+                        keyWord:e
+                    }
+                },
+                res=>{
+                    this.setState({
+                        companyList:res
+                    })
+                })
+        }
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
             {
                 url:domain.companyList,
                 params:{
@@ -268,11 +285,12 @@ class RegistrationForm extends React.Component {
                 }
             },
             res=>{
+                console.log(res)
                 this.setState({
                     companyList:res
                 })
-            }
-        )
+            })
+        },this.state.dealy);
     }
     onChangeCompany(e){
         this.state.companyList.map((item)=>{
@@ -285,36 +303,72 @@ class RegistrationForm extends React.Component {
         })
     }
     // 查询区域经理
-    searchManage(e){
-        HttpRequest.getRequest(
-            {
-                url:domain.shopMangerList,
-                params:{
-                    keyWord:e,
-                    roleType:1
-                }
-            },
-            res=>{
-                this.setState({
-                    manageList:res
+    searchManage(e,immediate){
+        if(immediate){
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:1
+                    }
+                },
+                res=>{
+                    this.setState({
+                        manageList:res
+                    })
+                }) 
+        }
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:1
+                    }
+                },
+                res=>{
+                    this.setState({
+                        manageList:res
+                    })
                 })
-            })
+        },this.state.dealy);
     }
     // 查询对接人
-    searchPickPerson(e){
-        HttpRequest.getRequest(
-            {
-                url:domain.shopMangerList,
-                params:{
-                    keyWord:e,
-                    roleType:2
-                }
-            },
-            res=>{
-                this.setState({
-                    pickList:res
+    searchPickPerson(e,immediate){
+        if(immediate){
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:2
+                    }
+                },
+                res=>{
+                    this.setState({
+                        pickList:res
+                    })
                 })
-            })
+        }
+        clearTimeout(this.timer);
+        this.timer = setTimeout(()=>{
+            HttpRequest.getRequest(
+                {
+                    url:domain.shopMangerList,
+                    params:{
+                        keyWord:e,
+                        roleType:2
+                    }
+                },
+                res=>{
+                    this.setState({
+                        pickList:res
+                    })
+                })
+        },this.state.dealy);
     }
     handleShoptypeChange(e){
         if(e==="2"){
@@ -386,7 +440,7 @@ class RegistrationForm extends React.Component {
                             {getFieldDecorator(`organizationId`, {
                                 initialValue:editMsg.orgId,
                                 rules: [{
-                                    required: true,message: '请选择公司名称!',
+                                    required: false,message: '请选择公司名称!',
                                 }],
                             })(
                                 <Select

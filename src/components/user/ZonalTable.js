@@ -20,22 +20,7 @@ const columns = [
     {
         title: '负责人',
         dataIndex: 'name',
-        render: (text, row, index) => {
-            // console.log(row,index);
-            const obj = {
-                children: text,
-                props: {},
-            };
-            // if (index === 0 || index === 2) {
-            //     obj.props.rowSpan = 2;
-            // }
-            // if (index === 3 || index === 1) {
-            //     obj.props.rowSpan = 0;
-            // }
-
-            return obj;
-
-        },
+        render: renderContent,
     },
     {
         title: '大区',
@@ -48,27 +33,16 @@ const columns = [
         render: renderContent
     }];
 
-let dataLists = [
-    {
-        key: '1',
-        index:'1',
-        name: '杨总',
-        region: '西南',
-        province: '四川省/贵州省/云南省/西藏/重庆市',
-
-    },
-];
-
 //角色分配
 class ZonalTable extends Component{
     constructor(props){
         super(props);
         this.state={
+            dataLists:[]
         };
 
     }
     componentDidMount = ()=>{
-        let _this=this;
         let i=0;
         HttpRequest.getRequest({
             url:domain.userZonal,
@@ -76,7 +50,9 @@ class ZonalTable extends Component{
             res.map((item)=>{
                 item['index']=i++;
             });
-            dataLists=res;
+            this.setState({
+                dataLists: res
+            })
         })
     }
 
@@ -84,7 +60,7 @@ class ZonalTable extends Component{
         return(
             <Table
                 columns={columns}
-                dataSource={dataLists}
+                dataSource={this.state.dataLists}
                 bordered
                 pagination={false}
                 rowKey={record => record.index}

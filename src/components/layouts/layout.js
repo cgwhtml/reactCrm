@@ -17,52 +17,14 @@ import '../../utils/style/common.less'
 const { Header, Sider, Content ,Footer} = Layout;
 const SubMenu = Menu.SubMenu;
 
-// const menuItems=[
-//     {
-//         key:'sub1',
-//         title:'主页',
-//         url:'/',
-//         children:[
-//             {
-//                 key:'sub1-0',
-//                 title:'首页',
-//                 url:'/',
-//             },
-//             {
-//                 key:'sub1-1',
-//                 title:'门店管理',
-//                 url:'/shopList',
-//             },
-//             {
-//                 key:'sub1-2',
-//                 title:'用户管理',
-//                 url:'/userList',
-//             },
-//             {
-//                 key:'sub1-3',
-//                 title:'法人机构管理',
-//                 url:'/orgList',
-//             },
-//             {
-//                 key:'sub1-4',
-//                 title:'组织机构管理',
-//                 url:'/deptList',
-//             },
-//             {
-//                 key:'sub1-5',
-//                 title:'区域管理',
-//                 url:'/areaList',
-//             },
-//         ]
-//     }
-// ];
 class AppLayout extends Component {
     static propTypes = {}
     state = {
         collapsed: false,
         content:'',
         openKeys:['sub1'],
-        menuItems:[]
+        menuItems:[],
+        userName:''
     };
     toggle = () => {
         this.setState({
@@ -88,6 +50,7 @@ class AppLayout extends Component {
         }
         // 添加响应拦截器
         axios.interceptors.response.use(function (response) {
+            console.log(response)
             if(response.data.error!==0){
                 showTips(response.data.message);
             }
@@ -110,7 +73,8 @@ class AppLayout extends Component {
                 const menu=[{id:'sub1',title:'主页', url:'/',children:[]}]
                 menu[0].children=res.menu
                 this.setState({
-                    menuItems:menu
+                    menuItems:menu,
+                    userName:res.userInfo.fullname
                 },()=>{
                     this.renderMenusNodes(this.state.menuItems)
                 })
@@ -139,6 +103,7 @@ class AppLayout extends Component {
     }
     render() {
         const _this=this;
+        const {userName}=_this.state;
         return (
         <HashRouter
             basename="/"
@@ -174,7 +139,7 @@ class AppLayout extends Component {
                         />
                         <ul style={{float:"right",marginRight:20,listStyle:"none"}}>
                             <li>
-                            <a href="/system/logout">用户 | 登出  <Icon type="export" /></a>
+                            <a href="/system/logout">{`您好，${userName}!`} | 登出  <Icon type="export" /></a>
                                 
                             </li>
                         </ul>
